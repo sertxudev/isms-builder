@@ -224,6 +224,23 @@ principle that your compliance data belongs to you.
 
 ---
 
+## Standards Reference Notice
+
+This software references control identifiers and short titles from published
+standards for interoperability and compliance management purposes only.
+
+- **ISO/IEC 27001** is a standard published by the International Organization
+  for Standardization (ISO). The full normative text is not included in this
+  software and must be obtained from [ISO](https://www.iso.org/standard/27001)
+  or an authorised national distributor.
+- **BSI IT-Grundschutz** material is published by the German Federal Office
+  for Information Security (BSI) and is freely available at
+  [bsi.bund.de](https://www.bsi.bund.de).
+- **NIS2, CRA, EUCS, EU AI Act** are EU legislative acts and are publicly
+  available via [eur-lex.europa.eu](https://eur-lex.europa.eu).
+
+---
+
 ## License
 
 Copyright (C) 2026 Claude Hecker
