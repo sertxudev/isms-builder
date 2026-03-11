@@ -9,7 +9,7 @@
   },
   {
     "id": "entity_sub1",
-    "name": "Gesellschaft Alpha GmbH",
+    "name": "Alpha GmbH",
     "type": "subsidiary",
     "parent": "entity_holding",
     "shortCode": "ALP",
@@ -17,7 +17,7 @@
   },
   {
     "id": "entity_sub2",
-    "name": "Gesellschaft Beta GmbH",
+    "name": "Beta GmbH",
     "type": "subsidiary",
     "parent": "entity_holding",
     "shortCode": "BET",
@@ -25,7 +25,7 @@
   },
   {
     "id": "entity_sub3",
-    "name": "Gesellschaft Gamma GmbH",
+    "name": "Gamma GmbH",
     "type": "subsidiary",
     "parent": "entity_holding",
     "shortCode": "GAM",

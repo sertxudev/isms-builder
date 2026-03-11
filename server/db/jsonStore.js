@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 // Simple JSON-file backed storage for ISMS templates (Deutsch start)
 // Path: data/templates.json
 const fs = require('fs')

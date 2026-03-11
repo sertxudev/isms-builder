@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 // Persistent store for editable dropdown lists used throughout the application.
 // Data saved to data/custom-lists.json; falls back to defaults if file missing.
 
@@ -11,33 +11,33 @@ const DB_FILE = path.join(_BASE, 'custom-lists.json')
 const DEFAULTS = {
   templateTypes: ['Policy', 'Procedure', 'Risk', 'SoA', 'Incident', 'Release'],
   riskCategories: [
-    { id: 'technical',      label: 'Technisch',       icon: 'ph-cpu' },
-    { id: 'organizational', label: 'Organisatorisch',  icon: 'ph-users' },
-    { id: 'physical',       label: 'Physisch',         icon: 'ph-building' },
-    { id: 'legal',          label: 'Rechtlich',        icon: 'ph-scales' },
+    { id: 'technical',      label: 'Technical',      icon: 'ph-cpu' },
+    { id: 'organizational', label: 'Organizational', icon: 'ph-users' },
+    { id: 'physical',       label: 'Physical',       icon: 'ph-building' },
+    { id: 'legal',          label: 'Legal',          icon: 'ph-scales' },
   ],
   riskTreatments: [
-    { id: 'reduce',   label: 'Reduzieren' },
-    { id: 'accept',   label: 'Akzeptieren' },
-    { id: 'avoid',    label: 'Vermeiden' },
-    { id: 'transfer', label: 'Übertragen' },
+    { id: 'reduce',   label: 'Reduce' },
+    { id: 'accept',   label: 'Accept' },
+    { id: 'avoid',    label: 'Avoid' },
+    { id: 'transfer', label: 'Transfer' },
   ],
   gdprDataCategories: ['name', 'email', 'phone', 'address', 'health', 'biometric', 'financial', 'location', 'other'],
   gdprSubjectTypes: [
-    { id: 'customers',        label: 'Kunden' },
-    { id: 'employees',        label: 'Mitarbeiter' },
-    { id: 'contractors',      label: 'Auftragnehmer' },
-    { id: 'website_visitors', label: 'Website-Besucher' },
-    { id: 'minors',           label: 'Minderjährige' },
+    { id: 'customers',        label: 'Customers' },
+    { id: 'employees',        label: 'Employees' },
+    { id: 'contractors',      label: 'Contractors' },
+    { id: 'website_visitors', label: 'Website Visitors' },
+    { id: 'minors',           label: 'Minors' },
   ],
   incidentTypes: [
-    { id: 'malware',              label: 'Malware / Schadsoftware' },
+    { id: 'malware',              label: 'Malware / Malicious Software' },
     { id: 'phishing',             label: 'Phishing / Scam' },
-    { id: 'data_theft',           label: 'Datenklau / Datenleck' },
-    { id: 'unauthorized_access',  label: 'Unberechtigter Zugriff' },
+    { id: 'data_theft',           label: 'Data Theft / Data Leak' },
+    { id: 'unauthorized_access',  label: 'Unauthorized Access' },
     { id: 'ransomware',           label: 'Ransomware' },
     { id: 'social_engineering',   label: 'Social Engineering' },
-    { id: 'other',                label: 'Sonstiges' },
+    { id: 'other',                label: 'Other' },
   ],
 }
 

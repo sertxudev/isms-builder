@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 // Minimal PostgreSQL storage adapter (skeleton).
 // This is a foundation for migrating from JSON to PostgreSQL.
 // Note: This is a scaffold; actual DB connection and table setup would be needed.

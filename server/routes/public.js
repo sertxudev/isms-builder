@@ -1,9 +1,19 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 'use strict'
 const express = require('express')
 const router = express.Router()
 const { requireAuth, authorize } = require('../auth')
 const publicIncidentStore = require('../db/publicIncidentStore')
+
+// Splash-Konfiguration öffentlich abrufbar (Login-Seite braucht sie vor Auth)
+router.get('/public/splash', (req, res) => {
+  try {
+    const orgSettingsStore = require('../db/orgSettingsStore')
+    const s = orgSettingsStore.get()
+    const sp = s.splashScreen || {}
+    res.json({ enabled: sp.enabled !== false, duration: Math.min(30, Math.max(1, Number(sp.duration) || 7)) })
+  } catch { res.json({ enabled: true, duration: 7 }) }
+})
 
 // Öffentliche Gesellschaftsliste (kein Login nötig)
 router.get('/public/entities', (req, res) => {

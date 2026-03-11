@@ -2,9 +2,9 @@
 const { createTestDataDir, removeTestDataDir } = require('./setup/testEnv')
 const { loginAs, authedGet, authedPut } = require('./setup/authHelper')
 
-// Reale Control-IDs aus dem soaStore-Seed (ISO27001)
-const CTRL_1 = 'ISO-5.1'
-const CTRL_2 = 'ISO-5.2'
+// Reale Control-IDs aus dem soaStore-Seed (BSI – immer vorhanden)
+const CTRL_1 = 'BSI-ISMS.1'
+const CTRL_2 = 'BSI-ORP.1'
 
 let dataDir, app, readerCookie, editorCookie
 
@@ -32,12 +32,12 @@ describe('SoA – Lesen', () => {
     expect(res.body.length).toBeGreaterThanOrEqual(2)
   })
 
-  test('GET /soa?framework=ISO27001 – Filter funktioniert', async () => {
-    const res = await authedGet(app, readerCookie, '/soa?framework=ISO27001')
+  test('GET /soa?framework=BSI – Filter funktioniert', async () => {
+    const res = await authedGet(app, readerCookie, '/soa?framework=BSI')
     expect(res.status).toBe(200)
     expect(Array.isArray(res.body)).toBe(true)
     expect(res.body.length).toBeGreaterThan(0)
-    expect(res.body.every(c => c.framework === 'ISO27001')).toBe(true)
+    expect(res.body.every(c => c.framework === 'BSI')).toBe(true)
   })
 
   test('GET /soa/summary – gibt Zusammenfassung', async () => {

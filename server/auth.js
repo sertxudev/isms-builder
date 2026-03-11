@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 // RBAC auth für ISMS Build Mode
 // Session: JWT-Cookie (sm_session), nicht mehr Base64
 // Header-Auth (X-User-Name / X-User-Role) nur wenn DEV_HEADER_AUTH=true

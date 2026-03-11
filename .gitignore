@@ -1,3 +1,14 @@
+# Claude Code — local only, not for public repo
+CLAUDE.md
+commit-and-push.sh
+json-editor.js
+json-editor-start.sh
+json-editor-stop.sh
+.json-editor.pid
+last_order_claude.md
+.last_order_claude.md.kate-swp
+.server.pid
+
 # Dependencies
 node_modules/
 
@@ -20,11 +31,15 @@ data.bak.*
 *.bak
 *.bak.*
 
+# soa.json mit ISO-Controls (urheberrechtlich geschützt, nicht im Repo)
+data/soa.full.json
+
 # Sensitive runtime data (generated, not needed for demo)
 data/audit-log.json
 data/embeddings.json
 data/rbac_users.json.bak*
 data/.demo_reset_done
+data/.demo_lang_set
 
 # Uploaded binary files (not tracked in git)
 data/template-files/
@@ -45,6 +60,7 @@ session*.md
 tmp/
 .DS_Store
 Thumbs.db
+claude.md
 
 # Puppeteer cache
 .local-chromium/

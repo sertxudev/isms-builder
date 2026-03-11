@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 // Entity Store – Konzernstruktur (Holding + Gesellschaften)
 // Persistenz: data/entities.json
 const fs = require('fs')

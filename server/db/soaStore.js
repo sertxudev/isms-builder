@@ -1,6 +1,13 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.30 — AGPL-3.0
 // SoA Store – Statement of Applicability
-// Multi-Framework: ISO 27001:2022 · BSI IT-Grundschutz · EU NIS2 · EUCS · EU AI Act
+// Multi-Framework: BSI IT-Grundschutz · EU NIS2 · EUCS · EU AI Act · CRA (built-in)
+//                  ISO 27001:2022 · ISO 9000:2015 · ISO 9001:2015 (user-supplied via data/iso-controls.json)
+//
+// NOTE: ISO 27001, ISO 9000, and ISO 9001 controls are NOT included in the distribution.
+// ISO standards are copyright-protected by ISO (© ISO). Redistribution of control text
+// requires a license. To use ISO framework controls, place a JSON array in data/iso-controls.json.
+// See scripts/import-iso-controls.sh for the expected format.
+//
 // Persistenz: data/soa.json
 // Control-IDs sind framework-präfixiert (z.B. ISO-5.1, BSI-ISMS.1, NIS2-a, EUCS-1, EUAI-9)
 const fs = require('fs')
@@ -23,107 +30,10 @@ const FRAMEWORKS = {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// ISO 27001:2022 – Annex A (93 Controls)
+// ISO 27001 / ISO 9000 / ISO 9001 controls are NOT bundled.
+// They are loaded at runtime from data/iso-controls.json if present.
+// See: loadUserISOControls() below, and scripts/import-iso-controls.sh
 // ─────────────────────────────────────────────────────────────────
-const ISO27001_CONTROLS = [
-  // Organizational (5.1–5.37)
-  { id:'ISO-5.1',  theme:'Organizational', title:'Policies for information security' },
-  { id:'ISO-5.2',  theme:'Organizational', title:'Information security roles and responsibilities' },
-  { id:'ISO-5.3',  theme:'Organizational', title:'Segregation of duties' },
-  { id:'ISO-5.4',  theme:'Organizational', title:'Management responsibilities' },
-  { id:'ISO-5.5',  theme:'Organizational', title:'Contact with authorities' },
-  { id:'ISO-5.6',  theme:'Organizational', title:'Contact with special interest groups' },
-  { id:'ISO-5.7',  theme:'Organizational', title:'Threat intelligence' },
-  { id:'ISO-5.8',  theme:'Organizational', title:'Information security in project management' },
-  { id:'ISO-5.9',  theme:'Organizational', title:'Inventory of information and other associated assets' },
-  { id:'ISO-5.10', theme:'Organizational', title:'Acceptable use of information and other associated assets' },
-  { id:'ISO-5.11', theme:'Organizational', title:'Return of assets' },
-  { id:'ISO-5.12', theme:'Organizational', title:'Classification of information' },
-  { id:'ISO-5.13', theme:'Organizational', title:'Labelling of information' },
-  { id:'ISO-5.14', theme:'Organizational', title:'Information transfer' },
-  { id:'ISO-5.15', theme:'Organizational', title:'Access control' },
-  { id:'ISO-5.16', theme:'Organizational', title:'Identity management' },
-  { id:'ISO-5.17', theme:'Organizational', title:'Authentication information' },
-  { id:'ISO-5.18', theme:'Organizational', title:'Access rights' },
-  { id:'ISO-5.19', theme:'Organizational', title:'Information security in supplier relationships' },
-  { id:'ISO-5.20', theme:'Organizational', title:'Addressing information security within supplier agreements' },
-  { id:'ISO-5.21', theme:'Organizational', title:'Managing information security in the ICT supply chain' },
-  { id:'ISO-5.22', theme:'Organizational', title:'Monitoring, review and change management of supplier services' },
-  { id:'ISO-5.23', theme:'Organizational', title:'Information security for use of cloud services' },
-  { id:'ISO-5.24', theme:'Organizational', title:'Information security incident management planning and preparation' },
-  { id:'ISO-5.25', theme:'Organizational', title:'Assessment and decision on information security events' },
-  { id:'ISO-5.26', theme:'Organizational', title:'Response to information security incidents' },
-  { id:'ISO-5.27', theme:'Organizational', title:'Learning from information security incidents' },
-  { id:'ISO-5.28', theme:'Organizational', title:'Collection of evidence' },
-  { id:'ISO-5.29', theme:'Organizational', title:'Information security during disruption' },
-  { id:'ISO-5.30', theme:'Organizational', title:'ICT readiness for business continuity' },
-  { id:'ISO-5.31', theme:'Organizational', title:'Legal, statutory, regulatory and contractual requirements' },
-  { id:'ISO-5.32', theme:'Organizational', title:'Intellectual property rights' },
-  { id:'ISO-5.33', theme:'Organizational', title:'Protection of records' },
-  { id:'ISO-5.34', theme:'Organizational', title:'Privacy and protection of personally identifiable information' },
-  { id:'ISO-5.35', theme:'Organizational', title:'Independent review of information security' },
-  { id:'ISO-5.36', theme:'Organizational', title:'Compliance with policies, rules and standards for information security' },
-  { id:'ISO-5.37', theme:'Organizational', title:'Documented operating procedures' },
-  // People (6.1–6.8)
-  { id:'ISO-6.1', theme:'People', title:'Screening' },
-  { id:'ISO-6.2', theme:'People', title:'Terms and conditions of employment' },
-  { id:'ISO-6.3', theme:'People', title:'Information security awareness, education and training' },
-  { id:'ISO-6.4', theme:'People', title:'Disciplinary process' },
-  { id:'ISO-6.5', theme:'People', title:'Responsibilities after termination or change of employment' },
-  { id:'ISO-6.6', theme:'People', title:'Confidentiality or non-disclosure agreements' },
-  { id:'ISO-6.7', theme:'People', title:'Remote working' },
-  { id:'ISO-6.8', theme:'People', title:'Information security event reporting' },
-  // Physical (7.1–7.14)
-  { id:'ISO-7.1',  theme:'Physical', title:'Physical security perimeters' },
-  { id:'ISO-7.2',  theme:'Physical', title:'Physical entry' },
-  { id:'ISO-7.3',  theme:'Physical', title:'Securing offices, rooms and facilities' },
-  { id:'ISO-7.4',  theme:'Physical', title:'Physical security monitoring' },
-  { id:'ISO-7.5',  theme:'Physical', title:'Protecting against physical and environmental threats' },
-  { id:'ISO-7.6',  theme:'Physical', title:'Working in secure areas' },
-  { id:'ISO-7.7',  theme:'Physical', title:'Clear desk and clear screen' },
-  { id:'ISO-7.8',  theme:'Physical', title:'Equipment siting and protection' },
-  { id:'ISO-7.9',  theme:'Physical', title:'Security of assets off-premises' },
-  { id:'ISO-7.10', theme:'Physical', title:'Storage media' },
-  { id:'ISO-7.11', theme:'Physical', title:'Supporting utilities' },
-  { id:'ISO-7.12', theme:'Physical', title:'Cabling security' },
-  { id:'ISO-7.13', theme:'Physical', title:'Equipment maintenance' },
-  { id:'ISO-7.14', theme:'Physical', title:'Secure disposal or re-use of equipment' },
-  // Technological (8.1–8.34)
-  { id:'ISO-8.1',  theme:'Technological', title:'User endpoint devices' },
-  { id:'ISO-8.2',  theme:'Technological', title:'Privileged access rights' },
-  { id:'ISO-8.3',  theme:'Technological', title:'Information access restriction' },
-  { id:'ISO-8.4',  theme:'Technological', title:'Access to source code' },
-  { id:'ISO-8.5',  theme:'Technological', title:'Secure authentication' },
-  { id:'ISO-8.6',  theme:'Technological', title:'Capacity management' },
-  { id:'ISO-8.7',  theme:'Technological', title:'Protection against malware' },
-  { id:'ISO-8.8',  theme:'Technological', title:'Management of technical vulnerabilities' },
-  { id:'ISO-8.9',  theme:'Technological', title:'Configuration management' },
-  { id:'ISO-8.10', theme:'Technological', title:'Information deletion' },
-  { id:'ISO-8.11', theme:'Technological', title:'Data masking' },
-  { id:'ISO-8.12', theme:'Technological', title:'Data leakage prevention' },
-  { id:'ISO-8.13', theme:'Technological', title:'Information backup' },
-  { id:'ISO-8.14', theme:'Technological', title:'Redundancy of information processing facilities' },
-  { id:'ISO-8.15', theme:'Technological', title:'Logging' },
-  { id:'ISO-8.16', theme:'Technological', title:'Monitoring activities' },
-  { id:'ISO-8.17', theme:'Technological', title:'Clock synchronization' },
-  { id:'ISO-8.18', theme:'Technological', title:'Use of privileged utility programs' },
-  { id:'ISO-8.19', theme:'Technological', title:'Installation of software on operational systems' },
-  { id:'ISO-8.20', theme:'Technological', title:'Networks security' },
-  { id:'ISO-8.21', theme:'Technological', title:'Security of network services' },
-  { id:'ISO-8.22', theme:'Technological', title:'Segregation of networks' },
-  { id:'ISO-8.23', theme:'Technological', title:'Web filtering' },
-  { id:'ISO-8.24', theme:'Technological', title:'Use of cryptography' },
-  { id:'ISO-8.25', theme:'Technological', title:'Secure development life cycle' },
-  { id:'ISO-8.26', theme:'Technological', title:'Application security requirements' },
-  { id:'ISO-8.27', theme:'Technological', title:'Secure system architecture and engineering principles' },
-  { id:'ISO-8.28', theme:'Technological', title:'Secure coding' },
-  { id:'ISO-8.29', theme:'Technological', title:'Security testing in development and acceptance' },
-  { id:'ISO-8.30', theme:'Technological', title:'Outsourced development' },
-  { id:'ISO-8.31', theme:'Technological', title:'Separation of development, test and production environments' },
-  { id:'ISO-8.32', theme:'Technological', title:'Change management' },
-  { id:'ISO-8.33', theme:'Technological', title:'Test information' },
-  { id:'ISO-8.34', theme:'Technological', title:'Protection of information systems during audit testing' },
-].map(c => ({ ...c, framework: 'ISO27001' }))
 
 // ─────────────────────────────────────────────────────────────────
 // BSI IT-Grundschutz – Kern-Bausteine
@@ -282,104 +192,7 @@ const EUAI_CONTROLS = [
   { id:'EUAI-GOV.3',   theme:'Governance',     title:'Verantwortliche Stelle und KI-Beauftragter' },
 ].map(c => ({ ...c, framework: 'EUAI' }))
 
-// ─────────────────────────────────────────────────────────────────
-// ISO 9000:2015 – Grundlagen und Begriffe (7 Qualitätsgrundsätze + Konzeptgruppen)
-// ─────────────────────────────────────────────────────────────────
-const ISO9000_CONTROLS = [
-  // 7 Qualitätsgrundsätze
-  { id:'ISO9000-P1', theme:'Qualitätsgrundsätze', title:'Kundenorientierung' },
-  { id:'ISO9000-P2', theme:'Qualitätsgrundsätze', title:'Führung' },
-  { id:'ISO9000-P3', theme:'Qualitätsgrundsätze', title:'Engagement von Personen' },
-  { id:'ISO9000-P4', theme:'Qualitätsgrundsätze', title:'Prozessorientierter Ansatz' },
-  { id:'ISO9000-P5', theme:'Qualitätsgrundsätze', title:'Verbesserung' },
-  { id:'ISO9000-P6', theme:'Qualitätsgrundsätze', title:'Faktengestützte Entscheidungsfindung' },
-  { id:'ISO9000-P7', theme:'Qualitätsgrundsätze', title:'Beziehungsmanagement' },
-  // Grundlegende Konzepte
-  { id:'ISO9000-C1', theme:'Grundkonzepte', title:'Qualität und ihre Wahrnehmung' },
-  { id:'ISO9000-C2', theme:'Grundkonzepte', title:'Qualitätsmanagementsystem als System' },
-  { id:'ISO9000-C3', theme:'Grundkonzepte', title:'Kontext einer Organisation' },
-  { id:'ISO9000-C4', theme:'Grundkonzepte', title:'Interessierte Parteien' },
-  { id:'ISO9000-C5', theme:'Grundkonzepte', title:'Unterstützung durch die oberste Leitung' },
-].map(c => ({ ...c, framework: 'ISO9000' }))
 
-// ─────────────────────────────────────────────────────────────────
-// ISO 9001:2015 – Anforderungen QMS (Kapitel 4–10)
-// ─────────────────────────────────────────────────────────────────
-const ISO9001_CONTROLS = [
-  // Kapitel 4 – Kontext der Organisation
-  { id:'ISO9001-4.1',  theme:'Kontext',          title:'Verstehen der Organisation und ihres Kontexts' },
-  { id:'ISO9001-4.2',  theme:'Kontext',          title:'Verstehen der Erfordernisse und Erwartungen interessierter Parteien' },
-  { id:'ISO9001-4.3',  theme:'Kontext',          title:'Festlegen des Anwendungsbereichs des QMS' },
-  { id:'ISO9001-4.4',  theme:'Kontext',          title:'QMS und seine Prozesse' },
-  // Kapitel 5 – Führung
-  { id:'ISO9001-5.1',  theme:'Führung',          title:'Führung und Verpflichtung' },
-  { id:'ISO9001-5.1.1',theme:'Führung',          title:'Führung und Verpflichtung – Allgemeines' },
-  { id:'ISO9001-5.1.2',theme:'Führung',          title:'Kundenorientierung' },
-  { id:'ISO9001-5.2',  theme:'Führung',          title:'Politik' },
-  { id:'ISO9001-5.2.1',theme:'Führung',          title:'Festlegen der Qualitätspolitik' },
-  { id:'ISO9001-5.2.2',theme:'Führung',          title:'Bekanntmachen der Qualitätspolitik' },
-  { id:'ISO9001-5.3',  theme:'Führung',          title:'Rollen, Verantwortlichkeiten und Befugnisse in der Organisation' },
-  // Kapitel 6 – Planung
-  { id:'ISO9001-6.1',  theme:'Planung',          title:'Maßnahmen zum Umgang mit Risiken und Chancen' },
-  { id:'ISO9001-6.2',  theme:'Planung',          title:'Qualitätsziele und Planung zu deren Erreichung' },
-  { id:'ISO9001-6.3',  theme:'Planung',          title:'Planung von Änderungen' },
-  // Kapitel 7 – Unterstützung
-  { id:'ISO9001-7.1',  theme:'Unterstützung',    title:'Ressourcen' },
-  { id:'ISO9001-7.1.1',theme:'Unterstützung',    title:'Ressourcen – Allgemeines' },
-  { id:'ISO9001-7.1.2',theme:'Unterstützung',    title:'Personen' },
-  { id:'ISO9001-7.1.3',theme:'Unterstützung',    title:'Infrastruktur' },
-  { id:'ISO9001-7.1.4',theme:'Unterstützung',    title:'Prozessumgebung' },
-  { id:'ISO9001-7.1.5',theme:'Unterstützung',    title:'Ressourcen zur Überwachung und Messung' },
-  { id:'ISO9001-7.1.6',theme:'Unterstützung',    title:'Wissen der Organisation' },
-  { id:'ISO9001-7.2',  theme:'Unterstützung',    title:'Kompetenz' },
-  { id:'ISO9001-7.3',  theme:'Unterstützung',    title:'Bewusstsein' },
-  { id:'ISO9001-7.4',  theme:'Unterstützung',    title:'Kommunikation' },
-  { id:'ISO9001-7.5',  theme:'Unterstützung',    title:'Dokumentierte Information' },
-  { id:'ISO9001-7.5.1',theme:'Unterstützung',    title:'Dokumentierte Information – Allgemeines' },
-  { id:'ISO9001-7.5.2',theme:'Unterstützung',    title:'Erstellen und Aktualisieren' },
-  { id:'ISO9001-7.5.3',theme:'Unterstützung',    title:'Lenkung dokumentierter Information' },
-  // Kapitel 8 – Betrieb
-  { id:'ISO9001-8.1',  theme:'Betrieb',          title:'Betriebliche Planung und Steuerung' },
-  { id:'ISO9001-8.2',  theme:'Betrieb',          title:'Anforderungen an Produkte und Dienstleistungen' },
-  { id:'ISO9001-8.2.1',theme:'Betrieb',          title:'Kommunikation mit dem Kunden' },
-  { id:'ISO9001-8.2.2',theme:'Betrieb',          title:'Bestimmen von Anforderungen für Produkte und Dienstleistungen' },
-  { id:'ISO9001-8.2.3',theme:'Betrieb',          title:'Überprüfung der Anforderungen' },
-  { id:'ISO9001-8.2.4',theme:'Betrieb',          title:'Änderungen der Anforderungen' },
-  { id:'ISO9001-8.3',  theme:'Betrieb',          title:'Entwicklung von Produkten und Dienstleistungen' },
-  { id:'ISO9001-8.3.1',theme:'Betrieb',          title:'Entwicklung – Allgemeines' },
-  { id:'ISO9001-8.3.2',theme:'Betrieb',          title:'Entwicklungsplanung' },
-  { id:'ISO9001-8.3.3',theme:'Betrieb',          title:'Entwicklungseingaben' },
-  { id:'ISO9001-8.3.4',theme:'Betrieb',          title:'Entwicklungssteuerung' },
-  { id:'ISO9001-8.3.5',theme:'Betrieb',          title:'Entwicklungsergebnisse' },
-  { id:'ISO9001-8.3.6',theme:'Betrieb',          title:'Entwicklungsänderungen' },
-  { id:'ISO9001-8.4',  theme:'Betrieb',          title:'Steuerung extern bereitgestellter Prozesse, Produkte und Dienstleistungen' },
-  { id:'ISO9001-8.4.1',theme:'Betrieb',          title:'Steuerung extern bereitgestellter – Allgemeines' },
-  { id:'ISO9001-8.4.2',theme:'Betrieb',          title:'Art und Umfang der Steuerung' },
-  { id:'ISO9001-8.4.3',theme:'Betrieb',          title:'Informationen für externe Anbieter' },
-  { id:'ISO9001-8.5',  theme:'Betrieb',          title:'Produktion und Dienstleistungserbringung' },
-  { id:'ISO9001-8.5.1',theme:'Betrieb',          title:'Steuerung der Produktion und Dienstleistungserbringung' },
-  { id:'ISO9001-8.5.2',theme:'Betrieb',          title:'Kennzeichnung und Rückverfolgbarkeit' },
-  { id:'ISO9001-8.5.3',theme:'Betrieb',          title:'Eigentum der Kunden oder externer Anbieter' },
-  { id:'ISO9001-8.5.4',theme:'Betrieb',          title:'Erhaltung' },
-  { id:'ISO9001-8.5.5',theme:'Betrieb',          title:'Tätigkeiten nach der Lieferung' },
-  { id:'ISO9001-8.5.6',theme:'Betrieb',          title:'Steuerung von Änderungen' },
-  { id:'ISO9001-8.6',  theme:'Betrieb',          title:'Freigabe von Produkten und Dienstleistungen' },
-  { id:'ISO9001-8.7',  theme:'Betrieb',          title:'Steuerung nichtkonformer Ergebnisse' },
-  // Kapitel 9 – Bewertung der Leistung
-  { id:'ISO9001-9.1',  theme:'Bewertung',        title:'Überwachung, Messung, Analyse und Bewertung' },
-  { id:'ISO9001-9.1.1',theme:'Bewertung',        title:'Überwachung und Messung – Allgemeines' },
-  { id:'ISO9001-9.1.2',theme:'Bewertung',        title:'Kundenzufriedenheit' },
-  { id:'ISO9001-9.1.3',theme:'Bewertung',        title:'Analyse und Bewertung' },
-  { id:'ISO9001-9.2',  theme:'Bewertung',        title:'Internes Audit' },
-  { id:'ISO9001-9.3',  theme:'Bewertung',        title:'Managementbewertung' },
-  { id:'ISO9001-9.3.1',theme:'Bewertung',        title:'Managementbewertung – Allgemeines' },
-  { id:'ISO9001-9.3.2',theme:'Bewertung',        title:'Eingaben der Managementbewertung' },
-  { id:'ISO9001-9.3.3',theme:'Bewertung',        title:'Ergebnisse der Managementbewertung' },
-  // Kapitel 10 – Verbesserung
-  { id:'ISO9001-10.1', theme:'Verbesserung',     title:'Allgemeines' },
-  { id:'ISO9001-10.2', theme:'Verbesserung',     title:'Nichtkonformität und Korrekturmaßnahmen' },
-  { id:'ISO9001-10.3', theme:'Verbesserung',     title:'Fortlaufende Verbesserung' },
-].map(c => ({ ...c, framework: 'ISO9001' }))
 
 // ─────────────────────────────────────────────────────────────────
 // EU Cyber Resilience Act (CRA) – Anforderungen an Produkte mit digitalen Elementen
@@ -424,17 +237,36 @@ const CRA_CONTROLS = [
 ].map(c => ({ ...c, framework: 'CRA' }))
 
 // ─────────────────────────────────────────────────────────────────
-// Alle Controls zusammenführen
+// Load user-supplied ISO controls from data/iso-controls.json
+// ISO standards are copyright-protected by ISO (© ISO).
+// This function returns an empty array when the file is absent.
 // ─────────────────────────────────────────────────────────────────
+function loadUserISOControls() {
+  const isoFile = path.join(DATA_DIR, 'iso-controls.json')
+  try {
+    if (fs.existsSync(isoFile)) {
+      const raw = JSON.parse(fs.readFileSync(isoFile, 'utf8'))
+      if (Array.isArray(raw)) return raw
+    }
+  } catch (e) {
+    console.error('[soaStore] iso-controls.json load error:', e.message)
+  }
+  return []
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Alle Controls zusammenführen
+// ISO 27001 / ISO 9000 / ISO 9001 werden aus data/iso-controls.json
+// geladen (falls vorhanden) — nicht aus dem Quellcode.
+// ─────────────────────────────────────────────────────────────────
+const USER_ISO_CONTROLS = loadUserISOControls()
 const ALL_SEED_CONTROLS = [
-  ...ISO27001_CONTROLS,
   ...BSI_CONTROLS,
   ...NIS2_CONTROLS,
   ...EUCS_CONTROLS,
   ...EUAI_CONTROLS,
-  ...ISO9000_CONTROLS,
-  ...ISO9001_CONTROLS,
   ...CRA_CONTROLS,
+  ...USER_ISO_CONTROLS,   // loaded from data/iso-controls.json if present
 ]
 
 function ensureDir() {

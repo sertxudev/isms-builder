@@ -1,145 +1,102 @@
 [
   {
-    "id": "Policy_1772735624723",
+    "id": "tmpl_demo_de_001",
     "type": "Policy",
     "language": "de",
-    "title": "Test Policy",
-    "content": "Inhalt",
+    "title": "Informationssicherheitsrichtlinie",
+    "content": "# Informationssicherheitsrichtlinie\n\n## 1. Zweck\n\nDiese Richtlinie legt den Rahmen zum Schutz von Informationswerten der Mustermann GmbH gemäß ISO 27001 fest.\n\n## 2. Geltungsbereich\n\nDiese Richtlinie gilt für alle Mitarbeiter, Auftragnehmer und Dritte mit Zugang zu Unternehmensinformationssystemen.\n\n## 3. Grundsätze\n\n- Alle Informationswerte sind gemäß ihrer Sensitivität zu klassifizieren und zu behandeln\n- Der Zugang zu Informationssystemen wird nach dem Need-to-Know-Prinzip gewährt\n- Alle Benutzer sind für den Schutz ihrer Zugangsdaten und die Meldung von Vorfällen verantwortlich\n\n## 4. Verantwortlichkeiten\n\n- **CISO**: Überwacht ISMS-Implementierung und Compliance\n- **IT-Sicherheit**: Implementiert technische Kontrollen\n- **Alle Mitarbeiter**: Halten diese Richtlinie und zugehörige Verfahren ein\n",
     "version": 1,
     "status": "approved",
     "owner": "admin",
-    "reviewDate": "2026-03-05T18:33:44.731Z",
-    "createdAt": "2026-03-05T18:33:44.723Z",
-    "updatedAt": "2026-03-05T18:33:44.731Z",
-    "history": [
-      {
-        "version": 1,
-        "content": "Inhalt",
-        "updatedAt": "2026-03-05T18:33:44.723Z"
-      }
-    ],
+    "reviewDate": "2027-01-01",
+    "createdAt": "2026-01-01T08:00:00.000Z",
+    "updatedAt": "2026-01-15T10:00:00.000Z",
+    "history": [],
     "statusHistory": [
       {
         "status": "draft",
         "changedBy": "admin",
-        "changedAt": "2026-03-05T18:33:44.723Z"
+        "changedAt": "2026-01-01T08:00:00.000Z"
       },
       {
         "status": "review",
         "changedBy": "alice",
-        "changedAt": "2026-03-05T18:33:44.725Z"
+        "changedAt": "2026-01-10T09:00:00.000Z"
       },
       {
         "status": "approved",
         "changedBy": "admin",
-        "changedAt": "2026-03-05T18:33:44.731Z"
-      }
-    ]
-  },
-  {
-    "id": "Procedure_1772735633349",
-    "type": "Procedure",
-    "language": "de",
-    "title": "Test",
-    "content": "",
-    "version": 1,
-    "status": "review",
-    "owner": "bob",
-    "reviewDate": null,
-    "createdAt": "2026-03-05T18:33:53.349Z",
-    "updatedAt": "2026-03-05T18:33:53.351Z",
-    "history": [
-      {
-        "version": 1,
-        "content": "",
-        "updatedAt": "2026-03-05T18:33:53.349Z"
+        "changedAt": "2026-01-15T10:00:00.000Z"
       }
     ],
-    "statusHistory": [
-      {
-        "status": "draft",
-        "changedBy": "bob",
-        "changedAt": "2026-03-05T18:33:53.349Z"
-      },
-      {
-        "status": "review",
-        "changedBy": "alice",
-        "changedAt": "2026-03-05T18:33:53.351Z"
-      }
-    ]
+    "linkedControls": [
+      "NIS2-a",
+      "BSI-ORP.1"
+    ],
+    "linkedPolicies": [],
+    "applicableEntities": []
   },
   {
-    "id": "Risk_1772801649130",
-    "type": "Risk",
+    "id": "tmpl_demo_de_002",
+    "type": "Policy",
     "language": "de",
-    "title": "Haftungsrisiko",
-    "content": "",
+    "title": "Richtlinie zur akzeptablen Nutzung von IT-Ressourcen",
+    "content": "# Richtlinie zur akzeptablen Nutzung von IT-Ressourcen\n\n## 1. Zweck\n\nDiese Richtlinie definiert die zulässige und unzulässige Nutzung von IT-Ressourcen der Mustermann GmbH.\n\n## 2. Zulässige Nutzung\n\n- Verwendung von IT-Ressourcen für legitime Geschäftszwecke\n- Zugriff auf für die Arbeit erforderliche Internetressourcen\n- Verwendung von unternehmensgenehmigter Software\n\n## 3. Unzulässige Nutzung\n\n- Zugriff auf illegale oder unangemessene Inhalte\n- Installation nicht autorisierter Software\n- Weitergabe von Zugangsdaten oder Umgehung von Sicherheitskontrollen\n- Nutzung von Unternehmensressourcen für private Geschäftstätigkeit\n",
     "version": 1,
     "status": "approved",
-    "owner": null,
-    "reviewDate": "2026-03-06T12:54:38.651Z",
-    "createdAt": "2026-03-06T12:54:09.130Z",
-    "updatedAt": "2026-03-06T12:54:38.651Z",
-    "history": [
-      {
-        "version": 1,
-        "content": "",
-        "updatedAt": "2026-03-06T12:54:09.130Z"
-      }
-    ],
+    "owner": "admin",
+    "reviewDate": "2027-01-01",
+    "createdAt": "2026-01-05T08:00:00.000Z",
+    "updatedAt": "2026-01-20T10:00:00.000Z",
+    "history": [],
     "statusHistory": [
       {
         "status": "draft",
-        "changedBy": "system",
-        "changedAt": "2026-03-06T12:54:09.130Z"
-      },
-      {
-        "status": "review",
         "changedBy": "admin",
-        "changedAt": "2026-03-06T12:54:33.205Z"
+        "changedAt": "2026-01-05T08:00:00.000Z"
       },
       {
         "status": "approved",
         "changedBy": "admin",
-        "changedAt": "2026-03-06T12:54:35.489Z"
-      },
-      {
-        "status": "review",
-        "changedBy": "admin",
-        "changedAt": "2026-03-06T12:54:36.738Z"
-      },
-      {
-        "status": "approved",
-        "changedBy": "admin",
-        "changedAt": "2026-03-06T12:54:38.651Z"
+        "changedAt": "2026-01-20T10:00:00.000Z"
       }
-    ]
+    ],
+    "linkedControls": [
+      "NIS2-a"
+    ],
+    "linkedPolicies": [],
+    "applicableEntities": []
   },
   {
-    "id": "SoA_1772803046851",
-    "type": "SoA",
+    "id": "tmpl_demo_de_003",
+    "type": "Procedure",
     "language": "de",
-    "title": "mir egal",
-    "content": "",
+    "title": "Incident-Response-Verfahren",
+    "content": "# Incident-Response-Verfahren\n\n## 1. Zweck\n\nDieses Verfahren definiert die Schritte zur Reaktion auf Informationssicherheitsvorfälle.\n\n## 2. Vorfallsklassifizierung\n\n| Schweregrad | Reaktionszeit | Eskalation |\n|-------------|--------------|------------|\n| Kritisch | 1 Stunde | CISO + Geschäftsleitung |\n| Hoch | 4 Stunden | CISO |\n| Mittel | 24 Stunden | IT-Sicherheit |\n| Niedrig | 5 Werktage | IT-Helpdesk |\n\n## 3. Reaktionsschritte\n\n1. **Erkennung**: Vorfall identifizieren und validieren\n2. **Eindämmung**: Betroffene Systeme isolieren\n3. **Beseitigung**: Bedrohung entfernen\n4. **Wiederherstellung**: Systeme in normalen Betrieb zurückführen\n5. **Nachbereitung**: Erkenntnisse und Verbesserungen dokumentieren\n",
     "version": 1,
-    "status": "draft",
-    "owner": null,
-    "reviewDate": null,
-    "createdAt": "2026-03-06T13:17:26.852Z",
-    "updatedAt": "2026-03-06T13:17:26.852Z",
-    "history": [
-      {
-        "version": 1,
-        "content": "",
-        "updatedAt": "2026-03-06T13:17:26.852Z"
-      }
-    ],
+    "status": "review",
+    "owner": "alice",
+    "reviewDate": "2026-06-01",
+    "createdAt": "2026-02-01T08:00:00.000Z",
+    "updatedAt": "2026-02-15T10:00:00.000Z",
+    "history": [],
     "statusHistory": [
       {
         "status": "draft",
-        "changedBy": "system",
-        "changedAt": "2026-03-06T13:17:26.852Z"
+        "changedBy": "alice",
+        "changedAt": "2026-02-01T08:00:00.000Z"
+      },
+      {
+        "status": "review",
+        "changedBy": "alice",
+        "changedAt": "2026-02-15T10:00:00.000Z"
       }
-    ]
+    ],
+    "linkedControls": [
+      "NIS2-a",
+      "NIS2-f"
+    ],
+    "linkedPolicies": [],
+    "applicableEntities": []
   }
 ]

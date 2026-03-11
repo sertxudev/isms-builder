@@ -1,6 +1,5 @@
-<!-- © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0 -->
+<!-- © 2026 Claude Hecker — ISMS Builder V 1.31 — AGPL-3.0 -->
 ![ISMS Builder Banner](isms-builder-banner.png)
-
 # ISMS Builder
 
 **Self-hosted Information Security Management System — open source, no cloud required**
@@ -9,7 +8,7 @@
 [![Tests](https://img.shields.io/badge/tests-176%20passing-brightgreen)](https://github.com/claudehecker/isms-builder/actions)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org)
-[![Version](https://img.shields.io/badge/version-1.29-informational)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.31-informational)](CHANGELOG.md)
 
 ---
 
@@ -73,6 +72,36 @@ It covers the full compliance lifecycle — from policy authoring to audit evide
 | **Traceability** | Every record links to SoA controls + policy documents — bidirectional | |
 | **Semantic Search** | Local AI search via Ollama (nomic-embed-text) with keyword fallback | |
 | **Multi-Entity** | Corporate structure tree, per-entity applicability for controls and policies | |
+| **Multilingual Demo Data** | First-login language picker loads full demo dataset in 🇩🇪 DE / 🇬🇧 EN / 🇫🇷 FR / 🇳🇱 NL | |
+
+---
+
+### ⚠ IMPORTANT: ISO Controls Require Manual Installation by the Administrator
+
+> **ISO 27001:2022, ISO 9000:2015, and ISO 9001:2015** are copyright-protected standards published
+> by the International Organization for Standardization (ISO, © ISO). The control definitions
+> (titles, descriptions, requirement text) are **not included** in this software and must **not**
+> be redistributed without a valid ISO licence.
+
+**What this means in practice:**
+The SoA modules for ISO 27001, ISO 9000, and ISO 9001 ship without control content.
+The administrator **must manually import** the controls before these frameworks are usable:
+
+1. Obtain a licensed copy of the standard from [iso.org](https://www.iso.org/) or an authorised national body
+2. Prepare a JSON file with your control definitions (format documented in `scripts/import-iso-controls.sh`)
+3. Run the import script:
+   ```bash
+   bash scripts/import-iso-controls.sh path/to/iso-controls.json
+   ```
+4. Restart the ISMS Builder server
+
+> **Frameworks included out-of-the-box (no ISO licence required):**
+> BSI IT-Grundschutz, EU NIS2, EUCS, EU AI Act, and CRA are based on publicly available
+> EU legislation and German federal publications and are fully pre-installed.
+
+Operating the ISO framework modules without a valid licence for the respective standard is the
+sole responsibility of the operator. The ISMS Builder project and its contributors accept no
+liability for unlicensed use of ISO-protected content.
 
 ---
 
@@ -86,7 +115,7 @@ cp .env.example .env          # set JWT_SECRET to a long random string
 npm start                     # http://localhost:3000
 ```
 
-Login with **`admin` / `adminpass`** — change the password immediately after first login.
+Login with **`admin` / `adminpass`**. On first login you will be prompted to choose your **demo data language** (🇩🇪 DE / 🇬🇧 EN / 🇫🇷 FR / 🇳🇱 NL) or start with an empty system. Change the admin password immediately after.
 
 For production use with HTTPS and SQLite:
 
@@ -198,11 +227,12 @@ Contributions are very welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 | ✅ Done | Semantic search (Ollama / nomic-embed-text) |
 | ✅ Done | SQLite backend, Docker, CI/CD |
 | ✅ Done | GDPR deletion log email alerts |
+| ✅ Done | Multilingual demo bundles (DE / EN / FR / NL) |
 | 🔜 Next | PostgreSQL backend |
 | 🔜 Next | Scanner → Risk draft (nmap/OpenVAS XML import) |
 | 🔜 Next | Audit-log anomaly detection (LLM batch) |
 | 🚀 Later | ownCloud / Nextcloud integration |
-| 🚀 Later | English UI mirror |
+| 🚀 Later | Policy gap analysis (LLM) |
 
 ---
 
@@ -231,10 +261,13 @@ principle that your compliance data belongs to you.
 This software references control identifiers and short titles from published
 standards for interoperability and compliance management purposes only.
 
-- **ISO/IEC 27001** is a standard published by the International Organization
-  for Standardization (ISO). The full normative text is not included in this
-  software and must be obtained from [ISO](https://www.iso.org/standard/27001)
-  or an authorised national distributor.
+- **ISO/IEC 27001, ISO 9000, ISO 9001** are standards published by the
+  International Organization for Standardization (ISO). Control definitions
+  for these standards are **not included** in this software distribution —
+  ISO copyright does not permit redistribution of control text. Users must
+  supply their own JSON file (see section above and `scripts/import-iso-controls.sh`).
+  The standards must be obtained from [ISO](https://www.iso.org/) or an
+  authorised national distributor.
 - **BSI IT-Grundschutz** material is published by the German Federal Office
   for Information Security (BSI) and is freely available at
   [bsi.bund.de](https://www.bsi.bund.de).

@@ -1,4 +1,38 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
+
+// Show splash screen (if enabled) then navigate to dashboard
+let _splashCfg = null
+async function _getSplashCfg() {
+  if (_splashCfg) return _splashCfg
+  try {
+    const r = await fetch('/public/splash')
+    _splashCfg = r.ok ? await r.json() : { enabled: false, duration: 7 }
+  } catch { _splashCfg = { enabled: false, duration: 7 } }
+  return _splashCfg
+}
+
+let _splashTimer = null
+function splashDone() {
+  if (_splashTimer) { clearTimeout(_splashTimer); _splashTimer = null }
+  window.location.href = '/ui/index.html'
+}
+
+async function showSplashThenGo() {
+  const cfg = await _getSplashCfg()
+  if (!cfg.enabled) { window.location.href = '/ui/index.html'; return }
+  const overlay = document.getElementById('splashOverlay')
+  const bar     = document.getElementById('splashBar')
+  if (!overlay) { window.location.href = '/ui/index.html'; return }
+  const ms = Math.min(30000, Math.max(1000, (cfg.duration || 7) * 1000))
+  overlay.classList.add('active')
+  if (bar) {
+    bar.style.transition = `transform ${ms}ms linear`
+    bar.style.transform  = 'scaleX(1)'
+    requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.transform = 'scaleX(0)' }))
+  }
+  _splashTimer = setTimeout(splashDone, ms)
+}
+
 function showError(msg) {
   const el = document.getElementById('error-msg')
   if (!el) { alert(msg); return }
@@ -33,7 +67,11 @@ async function submitLogin() {
       localStorage.setItem('isms_current_role', data.role)
       localStorage.setItem('isms_current_functions', JSON.stringify(data.functions || []))
       if (data.domain) localStorage.setItem('isms_current_domain', data.domain)
-      window.location.href = '/ui/index.html'
+      if (data.needsDemoLang && typeof openDemoLangOverlay === 'function') {
+        openDemoLangOverlay()
+      } else {
+        showSplashThenGo()
+      }
     } else {
       if (data && data.code === 'ENFORCE_2FA') {
         // 2FA systemweit erzwungen, aber für diesen Account noch nicht eingerichtet
@@ -62,7 +100,11 @@ async function submitLogin() {
               localStorage.setItem('isms_current_role', data2.role)
               localStorage.setItem('isms_current_functions', JSON.stringify(data2.functions || []))
               if (data2.domain) localStorage.setItem('isms_current_domain', data2.domain)
-              window.location.href = '/ui/index.html'
+              if (data2.needsDemoLang && typeof openDemoLangOverlay === 'function') {
+                openDemoLangOverlay()
+              } else {
+                showSplashThenGo()
+              }
             } else {
               showError('Login fehlgeschlagen: ' + (data2.error || 'Unbekannter Fehler'))
             }

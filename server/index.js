@@ -1,4 +1,4 @@
-// ISMS Builder V 1.28 – API Server (Node.js / Express)
+// ISMS Builder V 1.29 – API Server (Node.js / Express)
 // © 2026 Claude Hecker — AGPL-3.0
 
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') })
@@ -22,7 +22,8 @@ const PUBLIC_UI_FILES = new Set([
   'style.css',
   'logincheck.js',
   'login-submit.js',
-  'qr2fa.js'
+  'qr2fa.js',
+  'isms-builder-banner.png'
 ])
 
 app.use('/ui', (req, res, next) => {
@@ -31,6 +32,8 @@ app.use('/ui', (req, res, next) => {
     res.clearCookie('sm_session', { path: '/' })
     return uiStatic(req, res, next)
   }
+  // vendor/ assets (fonts, icons) are public — required by login page before auth
+  if (req.path.startsWith('/vendor/')) return uiStatic(req, res, next)
   if (PUBLIC_UI_FILES.has(filename)) return uiStatic(req, res, next)
   const sess = getSessionFromReq(req)
   if (!sess) return res.redirect('/ui/login.html')
@@ -172,6 +175,27 @@ try {
   require('./db/guidanceStore').seedRoleGuides()
 } catch (e) {
   console.warn('[seed] Rollen-Guides konnten nicht eingespeist werden:', e.message)
+}
+
+// SoA & Audit Leitfaden (idempotent)
+try {
+  require('./db/guidanceStore').seedSoaGuide()
+} catch (e) {
+  console.warn('[seed] SoA-Guide konnte nicht eingespeist werden:', e.message)
+}
+
+// Policy-Prozesse Leitfaden (idempotent)
+try {
+  require('./db/guidanceStore').seedPolicyGuide()
+} catch (e) {
+  console.warn('[seed] Policy-Guide konnte nicht eingespeist werden:', e.message)
+}
+
+// ISO-Controls Rechtlicher Hinweis (idempotent, immer sichtbar)
+try {
+  require('./db/guidanceStore').seedIsoNotice()
+} catch (e) {
+  console.warn('[seed] ISO-Hinweis konnte nicht eingespeist werden:', e.message)
 }
 
 // ── Export für Tests ──────────────────────────────────────────────────────────

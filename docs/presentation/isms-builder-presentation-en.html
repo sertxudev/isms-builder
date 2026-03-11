@@ -1,0 +1,1420 @@
+<!-- © 2026 Claude Hecker — ISMS Builder V 1.31 — AGPL-3.0 — https://www.gnu.org/licenses/agpl-3.0.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISMS Builder – Presentation</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #0d1117;
+    --surface:    #161b27;
+    --surface2:   #1e2535;
+    --border:     #2d3550;
+    --text:       #e6edf3;
+    --text-sub:   #8b949e;
+    --blue:       #0052cc;
+    --blue-light: #4c9aff;
+    --blue-bg:    #0c2d6b;
+    --green:      #2da44e;
+    --green-bg:   #0d3a1f;
+    --red:        #f85149;
+    --red-bg:     #3d0c0c;
+    --orange:     #e3b341;
+    --orange-bg:  #3a2300;
+    --purple:     #a371f7;
+    --purple-bg:  #2d1f5e;
+    --accent:     #0052cc;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  /* ── Deck ─────────────────────────────────────────────── */
+  .deck {
+    width: 100vw; height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 56px 72px 48px;
+    opacity: 0;
+    transition: opacity .35s ease;
+  }
+  .slide.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* ── Progress bar ─────────────────────────────────────── */
+  #progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--blue-light);
+    transition: width .3s ease;
+    z-index: 100;
+  }
+
+  /* ── Copyright footer ─────────────────────────────────── */
+  #copyright {
+    position: fixed;
+    bottom: 10px; left: 24px;
+    font-size: 11px;
+    color: var(--text-sub);
+    opacity: .55;
+    z-index: 100;
+    letter-spacing: .3px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* ── Nav controls ─────────────────────────────────────── */
+  .nav {
+    position: fixed;
+    bottom: 24px; right: 28px;
+    display: flex; gap: 8px; align-items: center;
+    z-index: 100;
+  }
+  .nav-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px; height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .nav-btn:hover { background: var(--blue); border-color: var(--blue); }
+  #slideNum {
+    font-size: 12px;
+    color: var(--text-sub);
+    padding: 0 6px;
+  }
+
+  /* ── Slide types ──────────────────────────────────────── */
+
+  /* TITLE slide */
+  .slide-title {
+    background: linear-gradient(135deg, #0d1117 0%, #0c1a3a 60%, #0a2a5c 100%);
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .slide-title-banner {
+    background-image: url('../../isms-builder-banner.png');
+    background-size: cover; background-position: center top; background-repeat: no-repeat;
+  }
+  .slide-title-banner::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(7,12,22,.78); z-index: 0;
+  }
+  .slide-title-banner > * { position: relative; z-index: 1; }
+
+  .slide-title .overline {
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--blue-light);
+    margin-bottom: 20px;
+  }
+  .slide-title h1 {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.05;
+    color: #fff;
+    max-width: 800px;
+  }
+  .slide-title h1 span { color: var(--blue-light); }
+  .slide-title .subtitle {
+    font-size: 22px;
+    color: var(--text-sub);
+    margin-top: 20px;
+    max-width: 680px;
+    line-height: 1.5;
+  }
+  .slide-title .meta {
+    margin-top: 48px;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .slide-title .meta-item {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .slide-title .meta-item .label {
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-sub);
+  }
+  .slide-title .meta-item .value {
+    font-size: 15px; color: var(--text);
+    font-weight: 600;
+  }
+  .title-deco {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 38%;
+    background: linear-gradient(180deg, var(--blue) 0%, var(--purple) 100%);
+    opacity: .07;
+    clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+
+  /* SECTION divider */
+  .slide-section {
+    background: var(--surface);
+    justify-content: center;
+    align-items: flex-start;
+    border-left: 6px solid var(--blue);
+  }
+  .slide-section .section-num {
+    font-size: 80px;
+    font-weight: 800;
+    color: var(--blue);
+    opacity: .25;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .slide-section h2 {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .slide-section .desc {
+    font-size: 18px;
+    color: var(--text-sub);
+    margin-top: 16px;
+    max-width: 640px;
+    line-height: 1.6;
+  }
+
+  /* CONTENT slide */
+  .slide-content h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 32px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .slide-content h2 .icon {
+    font-size: 32px;
+  }
+
+  /* ── Layout helpers ───────────────────────────────────── */
+  .cols {
+    display: grid;
+    gap: 20px;
+    flex: 1;
+  }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cols-6040 { grid-template-columns: 3fr 2fr; }
+
+  /* ── Card ─────────────────────────────────────────────── */
+  .card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+  .card h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .card.blue { border-color: var(--blue); background: rgba(0,82,204,.08); }
+  .card.green { border-color: var(--green); background: rgba(45,164,78,.08); }
+  .card.red   { border-color: var(--red);   background: rgba(248,81,73,.08); }
+  .card.orange { border-color: var(--orange); background: rgba(227,179,65,.08); }
+
+  /* ── KPI Grid ─────────────────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .kpi {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  .kpi .num {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi .num.green { color: var(--green); }
+  .kpi .num.red   { color: var(--red); }
+  .kpi .num.orange { color: var(--orange); }
+  .kpi .num.purple { color: var(--purple); }
+  .kpi .label {
+    font-size: 11px;
+    color: var(--text-sub);
+    line-height: 1.3;
+  }
+
+  /* ── Badge ─────────────────────────────────────────────── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+  }
+  .badge.green  { background: var(--green-bg); color: #56d364; border: 1px solid var(--green); }
+  .badge.blue   { background: var(--blue-bg);  color: var(--blue-light); border: 1px solid var(--blue); }
+  .badge.red    { background: var(--red-bg);   color: #ff7b72; border: 1px solid var(--red); }
+  .badge.orange { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange); }
+  .badge.gray   { background: var(--surface2); color: var(--text-sub); border: 1px solid var(--border); }
+  .badge.purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple); }
+
+  /* ── Check list ───────────────────────────────────────── */
+  .check {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .check li::before {
+    content: '✓ ';
+    color: var(--green);
+    font-weight: 700;
+  }
+  .check li.info::before  { content: '→ '; color: var(--blue-light); }
+  .check li.warn::before  { content: '⚠ '; color: var(--orange); }
+  .check li.bold { font-weight: 600; color: var(--text); }
+
+  /* ── Highlight ────────────────────────────────────────── */
+  .highlight {
+    background: rgba(76,154,255,.1);
+    border-left: 3px solid var(--blue-light);
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .highlight.green { background: rgba(45,164,78,.1); border-left-color: var(--green); }
+  .highlight.orange { background: rgba(227,179,65,.1); border-left-color: var(--orange); }
+
+  /* ── Table ─────────────────────────────────────────────── */
+  .table-wrap { overflow: auto; border-radius: 6px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--text-sub);
+    font-size: 11px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  code {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 12px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+  }
+
+  /* ── Module grid ──────────────────────────────────────── */
+  .module-grid {
+    display: grid;
+    gap: 8px;
+  }
+  .module-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .module-item .m-icon { font-size: 20px; }
+  .module-item .m-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .module-item .m-norm { font-size: 11px; color: var(--text-sub); }
+
+  .arch-box {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    background: var(--surface2);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .arch-box .layer-label {
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-sub);
+  }
+  .arch-box .layer-items { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .flow {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .flow-arrow { color: var(--text-sub); font-size: 18px; }
+  .flow-step.active { border-color: var(--blue); color: var(--blue-light); }
+
+  .big-text {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .big-text span { color: var(--blue-light); }
+
+  /* ── Footer ─────────────────────────────────────────────── */
+  .slide-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-sub);
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ── 1. TITLE ───────────────────────────────────────────── -->
+  <div class="slide slide-title slide-title-banner active" id="s1">
+    <div class="title-deco"></div>
+    <div class="overline">Open-Source ISMS Platform · V 1.31</div>
+    <h1>ISMS<br><span>Builder</span></h1>
+    <p class="subtitle">
+      Integrated Information Security Management System for SMEs and enterprises —
+      ISO 27001, NIS2, GDPR and BSI in a single platform.
+    </p>
+    <div class="meta">
+      <div class="meta-item">
+        <span class="label">Version</span>
+        <span class="value">V 1.31</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">License</span>
+        <span class="value">AGPL-3.0</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Stack</span>
+        <span class="value">Node.js · Vanilla JS · SQLite</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Modules</span>
+        <span class="value">16 integrated modules</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NEW: V 1.31 CHANGES ───────────────────────────────── -->
+  <div class="slide slide-content" id="s1b">
+    <h2><span class="icon">🆕</span> What's New in V 1.31</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card blue">
+          <h3>🌍 Multilingual Demo Bundles</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li>4 complete language packs: 🇩🇪 DE · 🇬🇧 EN · 🇫🇷 FR · 🇳🇱 NL</li>
+            <li>On first login: language picker overlay</li>
+            <li>All modules with realistic demo data per language</li>
+            <li>EN: 12 risks, 4 goals, 8 assets, 10 suppliers, legal</li>
+            <li>DE/FR/NL: 8 risks, 4 goals, 5 assets, 4 suppliers, legal</li>
+            <li>Guidance seeds respond to language selection (DE ↔ EN)</li>
+          </ul>
+        </div>
+        <div class="card green">
+          <h3>📚 Expanded Guidance Content</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li>New category <strong>SoA &amp; Audit</strong> — complete SoA guide</li>
+            <li>New category <strong>Policy Processes</strong> — policy lifecycle documentation</li>
+            <li>All 5 role guides in German and English</li>
+            <li>Language-sensitive seeds: content switches automatically with bundle</li>
+            <li>Full architecture documentation now in Guidance (admin-only)</li>
+            <li>Seeds run after bundle import without server restart</li>
+          </ul>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card orange">
+          <h3>🐛 Bug Fixes</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li><strong>Login icon invisible</strong> — vendor/ path was blocked by auth middleware; now public</li>
+            <li><strong>Guidance empty after bundle import</strong> — seeds now run after every import, not only at server start</li>
+            <li><strong>Risk heatmap sidebar missing</strong> — risk list panel added next to heatmap grid, sorted by score</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🎨 Login Page</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li>ISMS Builder banner as background image</li>
+            <li>Dark overlay for optimal readability</li>
+          </ul>
+        </div>
+        <div class="highlight green">
+          <strong>176 / 176 tests</strong> — all tests passing after all changes.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. AGENDA ──────────────────────────────────────────── -->
+  <div class="slide slide-content" id="s2">
+    <h2><span class="icon">📋</span> Agenda</h2>
+    <div class="cols cols-2">
+      <ul class="check" style="gap:12px;">
+        <li class="info bold">What is ISMS Builder?</li>
+        <li class="info bold">Compliance Coverage</li>
+        <li class="info bold">Architecture &amp; Deployment</li>
+        <li class="info bold">Dashboard Overview</li>
+        <li class="info bold">Statement of Applicability (SoA)</li>
+        <li class="info bold">Risk Management (ISO 27001, NIS2, EU AI Act, ISO 9001)</li>
+        <li class="info bold">GDPR &amp; Privacy</li>
+        <li class="info bold">Supply Chain Management</li>
+      </ul>
+      <ul class="check" style="gap:12px;">
+        <li class="info bold">Asset Management</li>
+        <li class="info bold">Business Continuity (BCM)</li>
+        <li class="info bold">Governance &amp; Legal</li>
+        <li class="info bold">Training &amp; Awareness</li>
+        <li class="info bold">RBAC &amp; Multi-Function Users</li>
+        <li class="info bold">User Guidance &amp; Onboarding</li>
+        <li class="info bold">Demo Mode &amp; Go-Live Transition</li>
+        <li class="info bold">Email Notifications</li>
+        <li class="info bold">Operations &amp; Deployment</li>
+        <li class="info bold">Roadmap</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── 3. WHAT IS ISMS BUILDER ───────────────────────────── -->
+  <div class="slide slide-content" id="s3">
+    <h2><span class="icon">🛡</span> What is ISMS Builder?</h2>
+    <p class="big-text" style="margin-bottom:16px;">
+      A <span>complete ISMS platform</span> — self-hosted, standards-compliant, no cloud dependency.
+    </p>
+    <div class="module-grid" style="grid-template-columns:repeat(4,1fr);gap:10px;flex:1;">
+      <div class="module-item" style="border-color:var(--blue);background:var(--blue-bg);"><div class="m-icon">📋</div><div class="m-name">Policy Management</div><div class="m-norm">ISO 27001 §5</div></div>
+      <div class="module-item" style="border-color:var(--blue);background:var(--blue-bg);"><div class="m-icon">🔐</div><div class="m-name">SoA – 313 Controls</div><div class="m-norm">8 Frameworks</div></div>
+      <div class="module-item" style="border-color:var(--red);background:var(--red-bg);"><div class="m-icon">⚠</div><div class="m-name">Risk Management</div><div class="m-norm">ISO 27001 §6.1 · NIS2</div></div>
+      <div class="module-item" style="border-color:var(--green);background:var(--green-bg);"><div class="m-icon">🔒</div><div class="m-name">GDPR &amp; Privacy</div><div class="m-norm">GDPR Art. 13–35</div></div>
+      <div class="module-item" style="border-color:var(--orange);background:var(--orange-bg);"><div class="m-icon">🏢</div><div class="m-name">Asset Management</div><div class="m-norm">ISO 27001 A.5.9–5.12</div></div>
+      <div class="module-item" style="border-color:var(--orange);background:var(--orange-bg);"><div class="m-icon">🚛</div><div class="m-name">Supply Chain Mgmt.</div><div class="m-norm">NIS2 Art. 21(2)(d) · EUCS</div></div>
+      <div class="module-item" style="border-color:var(--purple);background:var(--purple-bg);"><div class="m-icon">💓</div><div class="m-name">BCM / BCP</div><div class="m-norm">ISO 22301 · NIS2 A.5.29</div></div>
+      <div class="module-item" style="border-color:var(--green);background:var(--green-bg);"><div class="m-icon">🎓</div><div class="m-name">Training &amp; Awareness</div><div class="m-norm">ISO 27001 A.6.3</div></div>
+      <div class="module-item" style="border-color:var(--blue);background:var(--blue-bg);"><div class="m-icon">⚖</div><div class="m-name">Governance</div><div class="m-norm">ISO 27001 §9.3</div></div>
+      <div class="module-item" style="border-color:var(--green);background:var(--green-bg);"><div class="m-icon">📜</div><div class="m-name">Legal &amp; Privacy</div><div class="m-norm">Contracts · NDAs · Policies</div></div>
+      <div class="module-item" style="border-color:var(--red);background:var(--red-bg);"><div class="m-icon">🚨</div><div class="m-name">Incident Inbox</div><div class="m-norm">NIS2 · BSI · Public Report</div></div>
+      <div class="module-item" style="border-color:var(--blue);background:var(--blue-bg);"><div class="m-icon">📊</div><div class="m-name">Reports &amp; Compliance</div><div class="m-norm">Matrix · Gap · Audit Trail</div></div>
+      <div class="module-item" style="border-color:var(--purple);background:var(--purple-bg);"><div class="m-icon">🎯</div><div class="m-name">Security Goals</div><div class="m-norm">ISO 27001 §6.2 · KPIs</div></div>
+      <div class="module-item" style="border-color:var(--blue);background:var(--blue-bg);"><div class="m-icon">📅</div><div class="m-name">Calendar</div><div class="m-norm">Deadlines · Reviews · EoL</div></div>
+      <div class="module-item" style="border-color:var(--green);background:var(--green-bg);"><div class="m-icon">📚</div><div class="m-name">Guidance &amp; Onboarding</div><div class="m-norm">System Manual · Role Guides</div></div>
+      <div class="module-item" style="border-color:var(--orange);background:var(--orange-bg);"><div class="m-icon">👥</div><div class="m-name">RBAC + 2FA</div><div class="m-norm">4 Ranks · 7 Functions · TOTP</div></div>
+    </div>
+    <div class="highlight" style="margin-top:14px;">
+      → No SaaS subscription — complete data sovereignty · Open-Source (AGPL-3.0) · Self-hosted · Docker-ready
+    </div>
+  </div>
+
+  <!-- ── 4. COMPLIANCE ──────────────────────────────────────── -->
+  <div class="slide slide-content" id="s4">
+    <h2><span class="icon">⚖</span> Compliance Coverage</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+      <span class="badge green" style="font-size:13px;padding:5px 12px;">ISO 27001:2022</span>
+      <span class="badge green" style="font-size:13px;padding:5px 12px;">BSI IT-Grundschutz</span>
+      <span class="badge blue" style="font-size:13px;padding:5px 12px;">EU NIS2</span>
+      <span class="badge blue" style="font-size:13px;padding:5px 12px;">EU GDPR</span>
+      <span class="badge orange" style="font-size:13px;padding:5px 12px;">CRA</span>
+      <span class="badge orange" style="font-size:13px;padding:5px 12px;">EU AI Act</span>
+      <span class="badge purple" style="font-size:13px;padding:5px 12px;">EUCS (Cloud)</span>
+      <span class="badge gray" style="font-size:13px;padding:5px 12px;">ISO 9001:2015</span>
+    </div>
+    <div class="cols cols-2" style="flex:1;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Standard / Regulation</th><th>Coverage</th><th>Controls</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>ISO 27001:2022</strong></td><td><span class="badge green">Complete</span></td><td>93</td></tr>
+            <tr><td><strong>BSI IT-Grundschutz</strong></td><td><span class="badge green">Complete</span></td><td>66</td></tr>
+            <tr><td><strong>EU NIS2</strong></td><td><span class="badge green">Complete</span></td><td>10</td></tr>
+            <tr><td><strong>EU GDPR</strong></td><td><span class="badge green">Complete</span></td><td>— (dedicated module)</td></tr>
+            <tr><td><strong>EU Cyber Resilience Act</strong></td><td><span class="badge green">Complete</span></td><td>33</td></tr>
+            <tr><td><strong>EU AI Act</strong></td><td><span class="badge blue">Partial</span></td><td>18</td></tr>
+            <tr><td><strong>EUCS (Cloud)</strong></td><td><span class="badge green">Complete</span></td><td>23</td></tr>
+            <tr><td><strong>ISO 9001:2015</strong></td><td><span class="badge green">Complete</span></td><td>66</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="kpi-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="kpi"><div class="num">313</div><div class="label">Total controls</div></div>
+          <div class="kpi"><div class="num">8</div><div class="label">Frameworks</div></div>
+          <div class="kpi"><div class="num green">20</div><div class="label">Topic groups (cross-mapping)</div></div>
+          <div class="kpi"><div class="num purple">100%</div><div class="label">SoA export (JSON)</div></div>
+        </div>
+        <div class="highlight">
+          All controls are bidirectionally linked to templates, risks, assets and suppliers — complete traceability.
+        </div>
+        <div class="highlight green">
+          Statement of Applicability (SoA) per ISO 27001 §6.1.3 — revision-safe with versioning and full audit trail.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. ARCHITECTURE ────────────────────────────────────── -->
+  <div class="slide slide-content" id="s5">
+    <h2><span class="icon">🏗</span> Architecture &amp; Deployment</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="arch-box">
+          <div class="layer-label">Frontend</div>
+          <div class="layer-items">
+            <span class="badge gray">Vanilla JS SPA</span>
+            <span class="badge gray">Atlassian Dark Theme</span>
+            <span class="badge gray">No build chain</span>
+            <span class="badge gray">marked.js (Markdown)</span>
+          </div>
+        </div>
+        <div class="arch-box" style="border-color:var(--blue);">
+          <div class="layer-label">Backend API</div>
+          <div class="layer-items">
+            <span class="badge blue">Node.js 20+</span>
+            <span class="badge blue">Express.js</span>
+            <span class="badge blue">JWT (Cookie)</span>
+            <span class="badge blue">bcrypt + TOTP 2FA</span>
+            <span class="badge blue">Nodemailer (SMTP)</span>
+            <span class="badge blue">OpenAPI 3.0</span>
+          </div>
+        </div>
+        <div class="arch-box" style="border-color:var(--green);">
+          <div class="layer-label">Persistence</div>
+          <div class="layer-items">
+            <span class="badge green">SQLite (WAL)</span>
+            <span class="badge green">JSON (Dev/Demo)</span>
+            <span class="badge gray">PostgreSQL (Roadmap)</span>
+          </div>
+        </div>
+        <div class="arch-box" style="border-color:var(--purple);">
+          <div class="layer-label">Deployment</div>
+          <div class="layer-items">
+            <span class="badge purple">Docker / Docker Compose</span>
+            <span class="badge purple">SSL/HTTPS native</span>
+            <span class="badge purple">Linux / Windows / macOS</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card">
+          <h3>Security</h3>
+          <ul class="check" style="gap:8px;font-size:14px;">
+            <li>JWT Cookie (httpOnly, SameSite=Strict)</li>
+            <li>bcrypt passwords (12 rounds)</li>
+            <li>TOTP 2FA (FIDO-compatible)</li>
+            <li>Org-wide 2FA enforcement</li>
+            <li>RBAC: 8 roles, 4 rank levels</li>
+            <li>Full audit log (filterable, exportable)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Operations</h3>
+          <ul class="check" style="gap:8px;font-size:14px;">
+            <li>Quick start: <code style="background:var(--bg);padding:2px 6px;border-radius:3px;font-size:12px;">docker compose up</code></li>
+            <li>Backup script (tar.gz, schedulable)</li>
+            <li>30-day recycle bin + autopurge</li>
+            <li>Daily email digests (3 recipient groups)</li>
+            <li>Migration JSON → SQLite → PostgreSQL</li>
+          </ul>
+        </div>
+        <div class="highlight green">
+          <strong>176 automated tests</strong> — Jest + Supertest, isolated temp dir, run in CI on every push.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. DASHBOARD ───────────────────────────────────────── -->
+  <div class="slide slide-content" id="s6">
+    <h2><span class="icon">📊</span> Dashboard — ISMS Overview</h2>
+    <div class="kpi-grid" style="margin-bottom:18px;">
+      <div class="kpi"><div class="num">42</div><div class="label">Active templates</div></div>
+      <div class="kpi"><div class="num orange">3</div><div class="label">Critical risks</div></div>
+      <div class="kpi"><div class="num red">2</div><div class="label">DSAR due</div></div>
+      <div class="kpi"><div class="num green">87%</div><div class="label">SoA implemented</div></div>
+    </div>
+    <div class="cols cols-3" style="flex:1;">
+      <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+        <h3>🎯 Action Required</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <div style="background:var(--red-bg);border:1px solid var(--red);border-radius:6px;padding:8px 12px;color:var(--red);">⛔ 3 critical risks open</div>
+          <div style="background:var(--orange-bg);border:1px solid var(--orange);border-radius:6px;padding:8px 12px;color:var(--orange);">⚠ 5 templates due for review</div>
+          <div style="background:var(--orange-bg);border:1px solid var(--orange);border-radius:6px;padding:8px 12px;color:var(--orange);">⚠ 2 DSAR deadlines in 3 days</div>
+          <div style="background:var(--blue-bg);border:1px solid var(--blue);border-radius:6px;padding:8px 12px;color:var(--blue-light);">ℹ 1 supplier audit overdue</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>📅 14-Day Preview</h3>
+        <ul class="check" style="gap:7px;font-size:13px;">
+          <li>DATEV audit due (15 Mar)</li>
+          <li>Template review: IT Security Policy</li>
+          <li class="warn">Microsoft Enterprise Agreement expiring</li>
+          <li>BCM exercise: Ransomware scenario</li>
+          <li>Management Review Q1 2026</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📈 Top-5 Risks</h3>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;"><span>Ransomware attack</span><span class="badge red">Score 20</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>Cloud outage AWS</span><span class="badge red">Score 18</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>Data breach</span><span class="badge orange">Score 15</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>Insider threat</span><span class="badge orange">Score 12</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>Phishing attack</span><span class="badge orange">Score 10</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 7. SOA ──────────────────────────────────────────────── -->
+  <div class="slide slide-content" id="s7">
+    <h2><span class="icon">🔐</span> Statement of Applicability (SoA)</h2>
+    <div class="cols cols-6040" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Framework</th><th>Controls</th><th>Applicable</th><th>Implemented</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ISO 27001:2022</strong></td><td>93</td><td>88</td><td><span class="badge green">82 (93%)</span></td></tr>
+              <tr><td><strong>BSI Grundschutz</strong></td><td>66</td><td>60</td><td><span class="badge green">54 (90%)</span></td></tr>
+              <tr><td><strong>EU NIS2</strong></td><td>10</td><td>10</td><td><span class="badge orange">7 (70%)</span></td></tr>
+              <tr><td><strong>CRA (Cyber Resilience)</strong></td><td>33</td><td>28</td><td><span class="badge orange">18 (64%)</span></td></tr>
+              <tr><td><strong>ISO 9001:2015</strong></td><td>66</td><td>45</td><td><span class="badge green">41 (91%)</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="highlight">
+          <strong>Bidirectional linking:</strong> Every control knows all linked templates, risks, assets and suppliers — and vice versa.
+        </div>
+        <div class="flow">
+          <div class="flow-step">Select control</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">Edit inline</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">Link policy</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">Export JSON</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card blue">
+          <h3>Features</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li>8 frameworks in parallel</li>
+            <li>Inline editing directly in control</li>
+            <li>Filter + framework tabs</li>
+            <li>Applicability model (per entity)</li>
+            <li>Cross-mapping (20 topic groups)</li>
+            <li>JSON export (audit-proof)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Configurable</h3>
+          <p style="font-size:13px;color:var(--text-sub);">Admin can disable individual frameworks — dashboard and reports adjust automatically.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 8. RISK MANAGEMENT ─────────────────────────────────── -->
+  <div class="slide slide-content" id="s8">
+    <h2><span class="icon">⚠</span> Risk Management – Multi-Framework</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="kpi"><div class="num red">3</div><div class="label">Critical (Score ≥15)</div></div>
+          <div class="kpi"><div class="num orange">5</div><div class="label">High (Score 10–14)</div></div>
+          <div class="kpi"><div class="num green">4</div><div class="label">Medium/Low</div></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Risk</th><th>L.</th><th>I.</th><th>Score</th><th>Frameworks</th></tr></thead>
+            <tbody>
+              <tr><td>Ransomware</td><td>4</td><td>5</td><td><span class="badge red">20</span></td><td style="font-size:11px;color:var(--text-sub)">ISO · NIS2 · EUCS</td></tr>
+              <tr><td>Insider Threat</td><td>3</td><td>5</td><td><span class="badge red">15</span></td><td style="font-size:11px;color:var(--text-sub)">ISO · NIS2 · EUCS</td></tr>
+              <tr><td>Supply Chain Attack</td><td>2</td><td>5</td><td><span class="badge orange">10</span></td><td style="font-size:11px;color:var(--text-sub)">ISO · NIS2 · CRA</td></tr>
+              <tr><td>AI Discrimination</td><td>3</td><td>4</td><td><span class="badge orange">12</span></td><td style="font-size:11px;color:var(--text-sub)">EU AI Act · NIS2</td></tr>
+              <tr><td>NIS2 Reporting Violation</td><td>3</td><td>4</td><td><span class="badge orange">12</span></td><td style="font-size:11px;color:var(--text-sub)">NIS2 · ISO</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="highlight">
+          Risk treatment directly on the risk: Mitigate, Accept, Transfer, Avoid — with action plan and SoA linkage.
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card blue">
+          <h3>Regulatory Basis</h3>
+          <ul class="check" style="gap:5px;font-size:12px;">
+            <li><strong>ISO 27001 §6.1:</strong> Risk assessment &amp; treatment</li>
+            <li><strong>NIS2 Art. 21(2)(a):</strong> Risk analysis policies — mandatory measure</li>
+            <li><strong>NIS2 Art. 21(2)(f):</strong> Effectiveness assessment</li>
+            <li><strong>EUCS GOV.3:</strong> Risk management for cloud</li>
+            <li><strong>EU AI Act Art. 9:</strong> Risk management system for high-risk AI</li>
+            <li><strong>ISO 9001:2015 §6.1:</strong> Actions to address risks</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>5-Tab Interface</h3>
+          <ul class="check" style="gap:5px;font-size:13px;">
+            <li class="bold">Risk Register</li>
+            <li>Treatment Plans</li>
+            <li>Heatmap View</li>
+            <li>Category Overview</li>
+            <li>Reports &amp; Export</li>
+          </ul>
+        </div>
+        <div class="card orange">
+          <h3>Email Alert</h3>
+          <p style="font-size:12px;color:var(--orange);">CISO receives daily digest for Score ≥ 10 — automatically delivered by function.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 9. GDPR ─────────────────────────────────────────────── -->
+  <div class="slide slide-content" id="s9">
+    <h2><span class="icon">🔒</span> GDPR &amp; Privacy</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="module-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="module-item"><div class="m-icon">📋</div><div class="m-name">RoPA</div><div class="m-norm">Art. 30</div></div>
+          <div class="module-item"><div class="m-icon">🤝</div><div class="m-name">DPA Contracts</div><div class="m-norm">Art. 28</div></div>
+          <div class="module-item"><div class="m-icon">🔍</div><div class="m-name">DPIA</div><div class="m-norm">Art. 35</div></div>
+          <div class="module-item"><div class="m-icon">🚨</div><div class="m-name">Data Breaches</div><div class="m-norm">Art. 33/34</div></div>
+          <div class="module-item"><div class="m-icon">📨</div><div class="m-name">DSAR</div><div class="m-norm">Art. 15–22</div></div>
+          <div class="module-item"><div class="m-icon">🛡</div><div class="m-name">TOMs</div><div class="m-norm">Art. 32</div></div>
+        </div>
+        <div class="highlight orange">
+          <strong>72h Reporting Timer:</strong> On data breach, countdown starts automatically — DPO notified via email.
+        </div>
+        <div class="highlight">
+          <strong>Art. 17 Deletion Log:</strong> Every deletion is recorded with date, category, and legal basis.
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card">
+          <h3>DSAR Workflow</h3>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;gap:6px;">
+            <div class="flow-step active">Received (deadline set automatically)</div>
+            <div class="flow-arrow" style="transform:rotate(90deg);">→</div>
+            <div class="flow-step">Verification &amp; Identity Check</div>
+            <div class="flow-arrow" style="transform:rotate(90deg);">→</div>
+            <div class="flow-step">Response (30-day deadline)</div>
+            <div class="flow-arrow" style="transform:rotate(90deg);">→</div>
+            <div class="flow-step">Completed / Archived</div>
+          </div>
+        </div>
+        <div class="card blue">
+          <h3>9 Sub-Modules</h3>
+          <p style="font-size:13px;color:var(--text-sub);">RoPA · DPA Contracts · DPIA · Data Breaches · DSAR · TOMs · Deletion Log · Data Subject Rights · Supervisory Authorities</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 10. SUPPLY CHAIN ────────────────────────────────────── -->
+  <div class="slide slide-content" id="s10">
+    <h2><span class="icon">🚛</span> Supply Chain Management – Multi-Framework</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="kpi"><div class="num">10</div><div class="label">Suppliers</div></div>
+          <div class="kpi"><div class="num red">3</div><div class="label">Critical</div></div>
+          <div class="kpi"><div class="num orange">1</div><div class="label">Audit overdue</div></div>
+          <div class="kpi"><div class="num purple">7</div><div class="label">With data access</div></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Supplier</th><th>Type</th><th>Criticality</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Microsoft 365</strong></td><td>Cloud</td><td><span class="badge red">Critical</span></td><td><span class="badge green">Active</span></td></tr>
+              <tr><td><strong>SAP S/4HANA</strong></td><td>Software</td><td><span class="badge red">Critical</span></td><td><span class="badge green">Active</span></td></tr>
+              <tr><td><strong>AWS EMEA</strong></td><td>Cloud</td><td><span class="badge red">Critical</span></td><td><span class="badge orange">Review</span></td></tr>
+              <tr><td><strong>Hetzner</strong></td><td>Cloud</td><td><span class="badge orange">High</span></td><td><span class="badge green">Active</span></td></tr>
+              <tr><td><strong>Lexware</strong></td><td>Software</td><td><span class="badge gray">Medium</span></td><td><span class="badge gray">Inactive</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card blue">
+          <h3>Regulatory Basis</h3>
+          <ul class="check" style="gap:6px;font-size:13px;">
+            <li><strong>ISO 27001 A.5.19–5.23:</strong> Supplier relationships &amp; cloud services</li>
+            <li><strong>NIS2 Art. 21(2)(d):</strong> Supply chain security — mandatory measure</li>
+            <li><strong>EUCS SCM.1/2:</strong> Supply chain security &amp; sub-processor management</li>
+            <li><strong>CRA Art. 13:</strong> Due diligence for open-source components</li>
+          </ul>
+        </div>
+        <div class="card green">
+          <h3>Integrations</h3>
+          <ul class="check" style="gap:6px;font-size:13px;">
+            <li>Linked to Legal module (contracts)</li>
+            <li>Linked to GDPR module (DPA contracts)</li>
+            <li>Audit dates in calendar</li>
+            <li>CISO email digest for overdue audits</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 11. ASSETS & BCM ───────────────────────────────────── -->
+  <div class="slide slide-content" id="s11">
+    <h2><span class="icon">🏢</span> Asset Management &amp; Business Continuity</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card" style="border-color:var(--blue);">
+          <h3>Asset Management (ISO 27001 A.5.9–5.12)</h3>
+          <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">
+            <div class="kpi" style="padding:10px;"><div class="num" style="font-size:24px;">42</div><div class="label">Assets</div></div>
+            <div class="kpi" style="padding:10px;"><div class="num red" style="font-size:24px;">5</div><div class="label">Critical</div></div>
+            <div class="kpi" style="padding:10px;"><div class="num orange" style="font-size:24px;">3</div><div class="label">EoL soon</div></div>
+          </div>
+          <ul class="check" style="gap:6px;font-size:13px;">
+            <li>5 categories: Hardware, Software, Data, Service, Facility</li>
+            <li>4 classification levels (public to secret)</li>
+            <li>EoL date in calendar with alerts</li>
+          </ul>
+        </div>
+        <div class="highlight">
+          Assets are bidirectionally linked to SoA controls and policy templates.
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card" style="border-color:var(--purple);">
+          <h3>Business Continuity (BCM/BCP, ISO 22301)</h3>
+          <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">
+            <div class="kpi" style="padding:10px;"><div class="num purple" style="font-size:24px;">8</div><div class="label">BIA processes</div></div>
+            <div class="kpi" style="padding:10px;"><div class="num purple" style="font-size:24px;">7</div><div class="label">BCP plans</div></div>
+            <div class="kpi" style="padding:10px;"><div class="num purple" style="font-size:24px;">6</div><div class="label">Exercises</div></div>
+          </div>
+          <ul class="check" style="gap:6px;font-size:13px;">
+            <li>BIA with RTO / RPO / MTPD</li>
+            <li>Business Continuity Plans</li>
+            <li>Tabletop exercises with results</li>
+            <li>Plan tests in calendar</li>
+          </ul>
+        </div>
+        <div class="highlight green">
+          BCM plan tests are automatically flagged in the CISO digest when the next test is due in ≤ 14 days.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 12. GOVERNANCE & LEGAL ─────────────────────────────── -->
+  <div class="slide slide-content" id="s12">
+    <h2><span class="icon">⚖</span> Governance, Legal &amp; Training</h2>
+    <div class="cols cols-3" style="flex:1;">
+      <div class="card" style="border-color:var(--blue);">
+        <h3>Governance (ISO 27001 §9.3)</h3>
+        <ul class="check" style="gap:8px;font-size:13px;">
+          <li>Management Reviews</li>
+          <li>Committee meetings</li>
+          <li>Action tracking</li>
+          <li>KPI tracking</li>
+          <li>Decision register</li>
+        </ul>
+        <div style="margin-top:12px;">
+          <span class="badge blue">ISO 27001 §6.1</span>
+          <span class="badge blue">§9.1</span>
+          <span class="badge blue">§9.3</span>
+        </div>
+      </div>
+      <div class="card" style="border-color:var(--green);">
+        <h3>Legal &amp; Privacy</h3>
+        <ul class="check" style="gap:8px;font-size:13px;">
+          <li><strong>Contracts</strong> with validity tracking</li>
+          <li><strong>NDAs</strong> with expiry alerts</li>
+          <li><strong>Privacy Policies</strong></li>
+          <li>Linked to supplier module</li>
+          <li>Expiring contracts in calendar</li>
+        </ul>
+        <div style="margin-top:12px;">
+          <span class="badge green">GDPR Art. 28</span>
+        </div>
+      </div>
+      <div class="card" style="border-color:var(--orange);">
+        <h3>Training &amp; Awareness</h3>
+        <ul class="check" style="gap:8px;font-size:13px;">
+          <li>Training register with participants</li>
+          <li>Mandatory training tracking</li>
+          <li>Overdue training alert</li>
+          <li>Linked to policies &amp; controls</li>
+        </ul>
+        <div style="margin-top:12px;">
+          <span class="badge orange">ISO 27001 A.6.3</span>
+          <span class="badge orange">NIS2 Art. 20</span>
+        </div>
+        <div style="margin-top:12px;background:var(--orange-bg);border:1px solid var(--orange);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--orange);">
+          Admin digest: overdue trainings reported daily by email.
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>All modules: Soft-delete · Recycle bin (30 days) · Audit log · Traceability to SoA controls</span>
+    </div>
+  </div>
+
+  <!-- ── 13. RBAC & FUNCTIONS ───────────────────────────────── -->
+  <div class="slide slide-content" id="s13">
+    <h2><span class="icon">👥</span> RBAC &amp; Multi-Function Users</h2>
+    <div class="cols cols-6040" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <p style="font-size:15px;color:var(--text-sub);line-height:1.5;">
+          The system strictly separates <strong style="color:var(--text);">access rights</strong> (RBAC rank) from
+          <strong style="color:var(--text);">organizational functions</strong> —
+          one person can hold multiple functions simultaneously.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>RBAC Role</th><th>Rank</th><th>Typical Function</th></tr></thead>
+            <tbody>
+              <tr><td><code>reader</code> / <strong style="color:var(--orange)">revision</strong></td><td>1</td><td>Employee · <strong style="color:var(--orange)">Internal Audit ⚖</strong></td></tr>
+              <tr><td><code>editor</code> / <code>dept_head</code> / <code>qmb</code></td><td>2</td><td>Department head, QMO, policy author</td></tr>
+              <tr><td><code>contentowner</code> · <strong style="color:var(--orange)">DPO ⚖</strong> / <code>auditor</code></td><td>3</td><td>CISO, <strong style="color:var(--orange)">DPO</strong>, compliance officer</td></tr>
+              <tr><td><strong><code>admin</code></strong></td><td>4</td><td>System administrator</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="background:linear-gradient(135deg,#3a1a00,#2a1500);border:2px solid var(--orange);border-radius:8px;padding:14px 16px;">
+          <div style="font-size:13px;font-weight:800;color:var(--orange);margin-bottom:8px;letter-spacing:.3px;">⚖ STATUTORY INDEPENDENCE</div>
+          <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;line-height:1.5;">
+            <div><span style="color:var(--orange);font-weight:700;">DPO / Data Protection Officer</span> — must not receive instructions and is protected against dismissal.<br><span style="color:var(--text-sub);">Legal basis: GDPR Art. 38(3)</span></div>
+            <div><span style="color:var(--orange);font-weight:700;">Internal Audit</span> — reports directly to the board, instruction-independent from line management.<br><span style="color:var(--text-sub);">Legal basis: IIA Standard 1100</span></div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--text-sub);border-top:1px solid #5a3000;padding-top:8px;">
+            In the system: role <code>revision</code> has rank 1 (read-only) — can only review, not modify. DPO gets function <code>dso</code> independent of RBAC rank.
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card blue">
+          <h3>Organizational Functions</h3>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;">
+            <div style="display:flex;justify-content:space-between;"><span>🛡 CISO / ISB</span><span class="badge blue">ciso</span></div>
+            <div style="display:flex;justify-content:space-between;"><span>🔒 DPO / DSB</span><span class="badge blue">dso</span></div>
+            <div style="display:flex;justify-content:space-between;"><span>✅ QMO</span><span class="badge gray">qmb</span></div>
+            <div style="display:flex;justify-content:space-between;"><span>🚨 BCM Manager</span><span class="badge gray">bcm_manager</span></div>
+            <div style="display:flex;justify-content:space-between;"><span>👤 Department Head</span><span class="badge gray">dept_head</span></div>
+            <div style="display:flex;justify-content:space-between;"><span>🔍 Internal Auditor</span><span class="badge gray">auditor</span></div>
+            <div style="display:flex;justify-content:space-between;"><span>🔔 Admin Alerts</span><span class="badge gray">admin_notify</span></div>
+          </div>
+        </div>
+        <div class="card" style="border-color:var(--purple);">
+          <h3>2FA &amp; Session Security</h3>
+          <ul class="check" style="gap:5px;font-size:13px;">
+            <li>TOTP 2FA per user (QR code setup in browser)</li>
+            <li>Org-wide 2FA enforcement configurable</li>
+            <li>Login blocked with clear message when 2FA required</li>
+            <li>JWT cookie (8h, httpOnly, SameSite=Strict)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 14. GUIDANCE & ONBOARDING ─────────────────────────── -->
+  <div class="slide slide-content" id="s14">
+    <h2><span class="icon">📚</span> Guidance &amp; Onboarding</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <p style="font-size:14px;color:var(--text-sub);line-height:1.5;margin-bottom:4px;">
+          At server start, <strong style="color:var(--text);">role-specific user guides</strong> are automatically seeded in the Guidance module — idempotent and always up to date.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Guide</th><th>Content</th><th>Target Role</th></tr></thead>
+            <tbody>
+              <tr><td>🛡 CISO / ISB</td><td style="font-size:12px;">Risks, SoA, NIS2 reporting, reports, CISO settings</td><td><span class="badge blue">ciso</span></td></tr>
+              <tr><td>🔒 DPO / GDPO</td><td style="font-size:12px;">RoPA, DPA, DPIA, 72h timer, DSAR, TOMs, deletion log</td><td><span class="badge blue">dso</span></td></tr>
+              <tr><td>⚖ Internal Audit</td><td style="font-size:12px;">Compliance matrix, gap report, audit log, SoA review</td><td><span class="badge orange">revision</span></td></tr>
+              <tr><td>✅ QMO</td><td style="font-size:12px;">ISO 9001 controls, governance, training, QM goals</td><td><span class="badge gray">qmb</span></td></tr>
+              <tr><td>👤 Dept. Head</td><td style="font-size:12px;">Policies, risk reporting, training planning, assets</td><td><span class="badge gray">dept_head</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="highlight green">
+          <strong>V 1.31:</strong> All role guides now available in German and English. Language switches automatically with demo bundle selection.
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card blue">
+          <h3>5 Guidance Categories</h3>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;margin-top:4px;">
+            <div><span class="badge blue">System Manual</span> — platform overview, demo guide, onboarding</div>
+            <div><span class="badge blue">Roles</span> — 5 role-specific user guides (DE/EN)</div>
+            <div><span class="badge green">Policy Processes</span> — policy lifecycle: draft → review → approve</div>
+            <div><span class="badge orange">SoA &amp; Audit</span> — how to work with the SoA, audit evidence</div>
+            <div><span class="badge gray">Admin Intern</span> — architecture docs, OpenAPI, README (admin only)</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Seed Architecture</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li><code>seedDemoDoc()</code> — demo overview (pinOrder 1)</li>
+            <li><code>seedRoleGuides()</code> — 5 role guides (pinOrder 10–50, DE/EN)</li>
+            <li><code>seedSoaGuide()</code> — SoA/Audit guide (new in V 1.31)</li>
+            <li><code>seedPolicyGuide()</code> — Policy guide (new in V 1.31)</li>
+            <li>Idempotent: no duplicates on restart</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 15. DEMO MODE ──────────────────────────────────────── -->
+  <div class="slide slide-content" id="s15">
+    <h2><span class="icon">🔄</span> Demo Mode &amp; Go-Live Transition</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card blue">
+          <h3>🌍 Multilingual Demo Bundles (V 1.31)</h3>
+          <div class="flow" style="gap:6px;margin:10px 0;flex-wrap:wrap;">
+            <div class="flow-step active">First login</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Language picker overlay</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Select 🇩🇪 🇬🇧 🇫🇷 🇳🇱</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">Full demo data loaded</div>
+          </div>
+          <ul class="check" style="gap:6px;font-size:13px;">
+            <li>Complete realistic dataset per language</li>
+            <li>Risks, goals, assets, suppliers, policies, GDPR, legal</li>
+            <li>Seeds update automatically after bundle load</li>
+          </ul>
+        </div>
+        <div class="card red">
+          <h3>Demo Reset (Admin → Maintenance)</h3>
+          <ul class="check" style="gap:6px;font-size:13px;">
+            <li>Full JSON export before reset</li>
+            <li>All module data cleared</li>
+            <li>All users except admin deleted</li>
+            <li>admin → adminpass · 2FA disabled</li>
+            <li>Yellow banner on login page until first admin login</li>
+          </ul>
+          <p style="font-size:12px;color:var(--text-sub);margin-top:8px;">Confirmation: must type <code>RESET</code></p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card green">
+          <h3>Go-Live Checklist</h3>
+          <ul class="check" style="gap:8px;font-size:13px;">
+            <li>Change admin password immediately</li>
+            <li>Configure SMTP (Admin → Organisation)</li>
+            <li>Set JWT_SECRET (32+ random chars)</li>
+            <li>Enable SSL (SSL_CERT_FILE + SSL_KEY_FILE)</li>
+            <li>Switch to SQLite: <code>STORAGE_BACKEND=sqlite</code></li>
+            <li>Enforce 2FA org-wide (Admin → Security)</li>
+            <li>Configure CISO/DPO email recipients</li>
+            <li>Import your SoA control applicability</li>
+          </ul>
+        </div>
+        <div class="highlight">
+          <strong>Preserved after reset:</strong> SoA controls (313), dropdown lists, org settings<br>
+          <strong>Cleared:</strong> Templates, risks, GDPR, assets, BCM, legal, training, governance, suppliers, guidance, audit log, goals
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 16. EMAIL NOTIFICATIONS ────────────────────────────── -->
+  <div class="slide slide-content" id="s16">
+    <h2><span class="icon">📧</span> Email Notifications &amp; Alerts</h2>
+    <div class="cols cols-3" style="flex:1;">
+      <div class="card red">
+        <h3>🛡 CISO Digest (daily)</h3>
+        <ul class="check" style="gap:8px;font-size:13px;">
+          <li>Risks Score ≥ 10 (critical/high)</li>
+          <li>BCM plan tests in ≤ 14 days</li>
+          <li>Supplier audits overdue</li>
+          <li class="info">Recipients: users with function <strong>ciso</strong></li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h3>🔒 DPO Digest (daily)</h3>
+        <ul class="check" style="gap:8px;font-size:13px;">
+          <li>DSAR deadlines in ≤ 3 days</li>
+          <li>GDPR incidents open &gt; 48h</li>
+          <li class="info">Recipients: users with function <strong>dso</strong></li>
+          <li class="info">Fallback: CISO recipients</li>
+        </ul>
+      </div>
+      <div class="card orange">
+        <h3>⚙ Admin Digest (daily)</h3>
+        <ul class="check" style="gap:8px;font-size:13px;">
+          <li>Contracts expiring in ≤ 30 days</li>
+          <li>Template reviews in ≤ 14 days</li>
+          <li>Overdue trainings</li>
+          <li class="info">Recipients: function <strong>admin_notify</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="highlight">
+        <strong>Configuration:</strong> SMTP credentials either via <code style="font-size:12px;">.env</code> or directly in Admin Panel (effective without server restart).
+      </div>
+      <div class="highlight green">
+        <strong>Dual role:</strong> CISO + DPO in one person → gets both digests automatically. No manual configuration needed.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 17. DEPLOYMENT ─────────────────────────────────────── -->
+  <div class="slide slide-content" id="s17">
+    <h2><span class="icon">🚀</span> Operations &amp; Deployment</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card green">
+          <h3>Quick Start (Docker)</h3>
+          <pre style="background:var(--bg);border-radius:6px;padding:12px;font-size:13px;color:var(--text);overflow:auto;">git clone https://github.com/claudehecker/isms-builder
+cp .env.docker .env
+# Set JWT_SECRET:
+openssl rand -hex 32
+
+docker compose up -d --build</pre>
+        </div>
+        <div class="card">
+          <h3>Direct (Node.js)</h3>
+          <pre style="background:var(--bg);border-radius:6px;padding:12px;font-size:13px;color:var(--text);overflow:auto;">npm install
+cp .env.example .env
+node server/index.js</pre>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Feature</th><th>Default</th></tr></thead>
+            <tbody>
+              <tr><td>Storage Backend</td><td><span class="badge green">SQLite (WAL)</span></td></tr>
+              <tr><td>SSL/HTTPS</td><td>SSL_CERT_FILE + SSL_KEY_FILE in .env</td></tr>
+              <tr><td>Port</td><td>3000 (configurable)</td></tr>
+              <tr><td>JWT validity</td><td>8h (configurable)</td></tr>
+              <tr><td>Recycle bin</td><td>30 days (autopurge)</td></tr>
+              <tr><td>Backup</td><td>backup-and-deploy.sh (tar.gz)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="highlight">
+          <strong>Migration:</strong> JSON → SQLite in one command:<br>
+          <code style="font-size:12px;">node tools/migrate-json-to-sqlite.js</code>
+        </div>
+        <div class="highlight green">
+          <strong>PostgreSQL:</strong> Planned for v2 — full multi-instance capability and high availability.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 18. ROADMAP ────────────────────────────────────────── -->
+  <div class="slide slide-content" id="s18">
+    <h2><span class="icon">🗺</span> Roadmap &amp; Next Steps</h2>
+    <div class="cols cols-3" style="flex:0 0 auto;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--green);font-weight:700;margin-bottom:4px;">✅ Implemented</div>
+        <ul class="check" style="gap:8px;font-size:13px;">
+          <li>16 integrated modules</li>
+          <li>313 SoA controls (8 frameworks)</li>
+          <li>RBAC + 2FA + Audit log</li>
+          <li>Supply chain management</li>
+          <li>Multi-function users</li>
+          <li>Email digests (3 recipient groups)</li>
+          <li>SQLite backend (WAL)</li>
+          <li>Docker deployment</li>
+          <li>176 automated tests</li>
+          <li>OpenAPI 3.0 documentation</li>
+          <li>Semantic search (Ollama)</li>
+          <li>Multilingual demo bundles (DE/EN/FR/NL)</li>
+        </ul>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--orange);font-weight:700;margin-bottom:4px;">🔜 Short-term (v1.x)</div>
+        <ul class="check" style="gap:8px;font-size:13px;">
+          <li class="info">PostgreSQL backend</li>
+          <li class="info">Scanner → Risk draft (nmap/OpenVAS XML import)</li>
+          <li class="info">Audit-log anomaly detection (LLM batch)</li>
+          <li class="info">CSV export Legal module</li>
+          <li class="info">File upload for contracts (PDF)</li>
+        </ul>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--purple);font-weight:700;margin-bottom:4px;">🚀 Mid-term (v2.0)</div>
+        <ul class="check" style="gap:8px;font-size:13px;">
+          <li class="info">Multi-instance / HA (PostgreSQL)</li>
+          <li class="info">SSO / SAML integration</li>
+          <li class="info">Mobile app (PWA)</li>
+          <li class="info">REST webhook integration</li>
+          <li class="info">ownCloud / Nextcloud integration</li>
+        </ul>
+      </div>
+    </div>
+    <!-- AI Integration Banner -->
+    <div style="margin-top:16px;background:linear-gradient(90deg,rgba(99,102,241,0.15) 0%,rgba(168,85,247,0.12) 100%);border:1px solid rgba(168,85,247,0.35);border-radius:10px;padding:14px 20px;">
+      <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#a855f7;font-weight:700;margin-bottom:10px;">🤖 Planned: Local AI Integration (Ollama · GDPR-compliant · 100% on-premise)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;">
+        <div style="font-size:12px;line-height:1.5;"><strong style="color:var(--text);">Semantic Search</strong><br><span style="color:var(--text-sub);">Embedding model (nomic-embed-text) vectorizes all documents — search by meaning, not keyword</span></div>
+        <div style="font-size:12px;line-height:1.5;"><strong style="color:var(--text);">Audit-Log Anomaly Detection</strong><br><span style="color:var(--text-sub);">Nightly batch job analyses activity patterns, reports anomalies in dashboard</span></div>
+        <div style="font-size:12px;line-height:1.5;"><strong style="color:var(--text);">Scanner → Risk Draft</strong><br><span style="color:var(--text-sub);">nmap/OpenVAS output automatically converted to risk drafts — CISO approval required</span></div>
+        <div style="font-size:12px;line-height:1.5;"><strong style="color:var(--text);">Policy Gap Analysis</strong><br><span style="color:var(--text-sub);">LLM reviews template content against SoA controls, suggests missing sections</span></div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Open-Source · AGPL-3.0 · Contributions welcome (CONTRIBUTING.md)</span>
+      <span>176 tests passing · OpenAPI 3.0 · Docker-ready</span>
+    </div>
+  </div>
+
+  <!-- ── CLOSING ─────────────────────────────────────────────── -->
+  <div class="slide slide-title slide-title-banner" id="s_end">
+    <div class="title-deco"></div>
+    <div class="overline">Questions &amp; Discussion</div>
+    <h1>Thank You<br><span>for Your</span><br>Attention</h1>
+    <p class="subtitle">
+      ISMS Builder V 1.31 — the open-source platform for practical information security management.
+    </p>
+    <div class="meta">
+      <div class="meta-item">
+        <span class="label">Version</span>
+        <span class="value">V 1.31</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Modules</span>
+        <span class="value">16 integrated</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Controls</span>
+        <span class="value">313 (8 Frameworks)</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Tests</span>
+        <span class="value">176 / 176 ✓</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Demo Languages</span>
+        <span class="value">🇩🇪 🇬🇧 🇫🇷 🇳🇱</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">License</span>
+        <span class="value">AGPL-3.0</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ── Copyright ──────────────────────────────────────────── -->
+<div id="copyright">© 2026 Claude Hecker — ISMS Builder V 1.31 — AGPL-3.0</div>
+
+<!-- ── Navigation ─────────────────────────────────────────── -->
+<div class="nav">
+  <button class="nav-btn" id="btnPrev" title="Back (←)">&#8592;</button>
+  <span id="slideNum">1 / 20</span>
+  <button class="nav-btn" id="btnNext" title="Next (→)">&#8594;</button>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'))
+  const total  = slides.length
+
+  let cur = 0
+
+  function go(n) {
+    slides[cur].classList.remove('active')
+    cur = Math.max(0, Math.min(n, total - 1))
+    slides[cur].classList.add('active')
+    document.getElementById('slideNum').textContent = `${cur + 1} / ${total}`
+    document.getElementById('progress').style.width = `${((cur + 1) / total) * 100}%`
+    document.getElementById('btnPrev').style.opacity = cur === 0 ? '.3' : '1'
+    document.getElementById('btnNext').style.opacity = cur === total - 1 ? '.3' : '1'
+  }
+
+  document.getElementById('btnPrev').addEventListener('click', () => go(cur - 1))
+  document.getElementById('btnNext').addEventListener('click', () => go(cur + 1))
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') go(cur + 1)
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                     go(cur - 1)
+    if (e.key === 'Home') go(0)
+    if (e.key === 'End')  go(total - 1)
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen()
+      else document.exitFullscreen()
+    }
+  })
+
+  // Touch/Swipe
+  let tx = 0
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX }, { passive: true })
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx
+    if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1))
+  }, { passive: true })
+
+  go(0)
+</script>
+</body>
+</html>

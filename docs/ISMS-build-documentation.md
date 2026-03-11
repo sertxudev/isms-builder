@@ -473,6 +473,33 @@ GET /reports/export/csv     – CSV-Export ?type=...&entity=...&framework=...
 
 ## 12. Statement of Applicability (SoA)
 
+> ### ⚠ RECHTLICHER HINWEIS: ISO-Controls erfordern manuelle Installation durch den Administrator
+>
+> **ISO 27001:2022, ISO 9000:2015 und ISO 9001:2015** sind urheberrechtlich geschützte Normen der
+> International Organization for Standardization (ISO). Die vollständigen Control-Definitionen
+> (Titel, Beschreibung, Anforderungstext) **sind nicht Bestandteil dieser Software** und dürfen
+> ohne Lizenz **nicht weitergegeben oder redistribuiert werden**.
+>
+> **Was das für den Betrieb bedeutet:**
+> Die SoA-Module für ISO 27001, ISO 9000 und ISO 9001 werden ohne Norminhalte ausgeliefert.
+> Der Administrator muss die Controls **eigenhändig** importieren:
+>
+> 1. Lizenzierte Kopie der Norm beschaffen: [iso.org](https://www.iso.org/) oder autorisierter Händler
+> 2. JSON-Datei mit den Control-Definitionen vorbereiten (Format: siehe `scripts/import-iso-controls.sh`)
+> 3. Importer ausführen:
+>    ```bash
+>    bash scripts/import-iso-controls.sh /pfad/zur/iso-controls.json
+>    ```
+> 4. Server neu starten
+>
+> **Enthaltene Frameworks (keine ISO-Lizenz erforderlich):**
+> BSI IT-Grundschutz, EU NIS2, EUCS, EU AI Act und CRA basieren auf öffentlich verfügbaren
+> EU-Rechtsakten bzw. Bundesbehörden-Veröffentlichungen und sind vollständig vorinstalliert.
+>
+> **Rechtsgrundlage:** ISO-Normen sind nach dem Urheberrecht (UrhG § 2, Art. 2 Berner Übereinkunft)
+> geschützt. Unbefugte Vervielfältigung oder öffentliche Zugänglichmachung — auch im internen
+> Betrieb ohne Lizenz — ist unzulässig.
+
 **Frameworks (313 Controls gesamt):**
 
 | ID | Name | Controls |
@@ -1814,3 +1841,356 @@ Der ISMS Builder wird als Demo-System ausgeliefert. Zwei Admin-Wartungsfunktione
 **Problem:** Der Sidebar-Button „Erstellen" (`#btnNewType`, `.sidebar-create-wrap`) war für alle eingeloggten Benutzer sichtbar, obwohl reader und revision keine Templates anlegen dürfen (API-Guard: editor+).
 
 **Fix:** In `init()` (`ui/app.js`) wird `.sidebar-create-wrap` ausgeblendet wenn `ROLE_RANK[currentRole] < ROLE_RANK['editor']`. Der API-seitige Schutz bleibt unverändert — die UI-Änderung ist rein kosmetisch/UX.
+
+---
+
+## 40. Mehrsprachigkeit (i18n) — DE / EN (V 1.29)
+
+### Übersicht
+
+Das ISMS Builder unterstützt zwei Sprachen: **Deutsch** (Standard) und **Englisch**. Die Spracheinstellung wird im `localStorage` des Browsers gespeichert (`isms_lang`) und wirkt sich sofort aus.
+
+### Architektur
+
+| Datei | Aufgabe |
+|---|---|
+| `ui/i18n/t.js` | Translation Engine: `t(key)`, `setLang()`, `getLang()`, `initLang()`, `detectBrowserLang()` |
+| `ui/i18n/translations.js` | Wörterbuch: 200+ Schlüssel mit `{ de: '…', en: '…' }` |
+
+**Funktionsweise:**
+1. `t.js` wird als erstes Skript geladen — ruft `initLang()` auf (aus localStorage oder Browser-Sprache)
+2. `translations.js` befüllt `window.TRANSLATIONS`
+3. `t(key)` gibt den String in `window.LANG` zurück; Fallback auf `'de'` wenn Schlüssel fehlt
+4. Parameterersetzung: `t('key', { name: 'World' })` mit `{name}` im String
+
+### Übersetzungs-Abdeckung (V 1.30 — vollständig)
+
+| Bereich | Abgedeckt |
+|---|---|
+| Login-Seite (komplette UI) | ✅ |
+| Sidebar-Navigation | ✅ |
+| Lifecycle-Buttons (Prüfung/Genehmigen/Archivieren) | ✅ |
+| Einstellungen — Sprachauswahl | ✅ |
+| Dashboard KPI-Labels | ✅ |
+| SoA, Reports, Admin, Incident | ✅ |
+| Risk & Compliance | ✅ |
+| Sicherheitsziele (Goals) | ✅ |
+| Legal & Privacy | ✅ |
+| Training & Schulungen | ✅ |
+| BCM / Business Continuity | ✅ |
+| Asset Management | ✅ |
+| Lieferkettenmanagement (Suppliers) | ✅ |
+| Governance | ✅ |
+| Kalender | ✅ |
+| Admin Listen-Verwaltung | ✅ |
+| **Gesamt** | **~350 Schlüssel, alle render-Funktionen abgedeckt** |
+
+### Sprachauswahl für Benutzer
+
+- **Login-Seite:** DE / EN Toggle-Buttons unterhalb der Login-Karte
+- **Einstellungen:** Sektion "Sprache / Language" ganz oben; Klick lädt Seite neu
+
+### Erkennung beim ersten Besuch
+
+Wenn noch keine Sprache gespeichert ist, erkennt `detectBrowserLang()` die Browser-Sprache (`navigator.language`): Deutsch wenn `de`, sonst Englisch.
+
+### Neue Sprache hinzufügen
+
+1. `t.js`: `SUPPORTED` Array erweitern
+2. `translations.js`: Dritte Sprachvariante in jeden Eintrag eintragen (z.B. `fr: '…'`)
+3. Login-Seite und Settings: weiteren Lang-Button hinzufügen
+
+### Relevante Dateien
+
+| Datei | Änderung |
+|---|---|
+| `ui/i18n/t.js` | Neu — Translation Engine |
+| `ui/i18n/translations.js` | Neu — Wörterbuch DE/EN |
+| `ui/login.html` | i18n-Skripte geladen; `data-i18n` Attribute; Lang-Switcher |
+| `ui/index.html` | i18n-Skripte geladen; `data-i18n` auf Shell-Elementen |
+| `ui/app.js` | `SECTION_META` + `labelKey`; `populateSectionNav()` nutzt `t()`; `LIFECYCLE_TRANSITIONS` + `labelKey`; `switchAppLang()` |
+
+## 41. English Demo Data (V 1.30)
+
+### Overview
+
+All demo/seed data in `data/` was translated from German to English in V 1.30. The ISMS Builder is now a fully English-language product out-of-the-box, consistent with the i18n UI layer introduced in V 1.29.
+
+### Translated Files
+
+| File | Records | Notes |
+|---|---|---|
+| `data/entities.json` | 4 | Company names: "Gesellschaft Alpha/Beta/Gamma GmbH" → "Alpha/Beta/Gamma GmbH" |
+| `data/templates.json` | 5 | `language: "de"` → `language: "en"`; titles and content in English |
+| `data/training.json` | 3 | Titles, descriptions, instructors translated |
+| `data/crossmap.json` | 20 | Topic and description fields translated |
+| `data/risks.json` | 12 | Title, description, threat, vulnerability translated |
+| `data/assets.json` | 22 | Description, custodian, location, tags, notes translated |
+| `data/suppliers.json` | 10 | Description, products, dataCategories, securityRequirements, notes translated |
+| `data/bcm.json` | 21 | BIA/plans/exercises: title, processOwner, dependencies, notes, procedures translated |
+| `data/governance.json` | 14 | Management reviews, actions, meeting minutes fully translated |
+| `data/public-incidents.json` | 10 | Incident reports translated; fictional domain names anonymised |
+| `data/crossmap.json` | 20 | Topic/description translated |
+| `data/gdpr/vvt.json` | 2 | RoPA records: title, purpose, legalBasisNote, recipients, retentionPeriod translated |
+| `data/gdpr/av.json` | 1 | DPA processingScope and notes translated |
+| `data/gdpr/dsfa.json` | 1 | DPIA fully translated (processingDescription, risk descriptions, mitigations, DPO opinion) |
+| `data/gdpr/toms.json` | 40 | TOMs: title, description, implementation, evidenceNote translated |
+| `data/legal/contracts.json` | 5 | Contract titles, descriptions, notes, owner fields translated |
+| `data/legal/ndas.json` | 5 | NDA titles, scope, notes translated |
+| `data/legal/privacy-policies.json` | 5 | Privacy policy titles, content, notes translated; `/datenschutz` → `/privacy` |
+| `data/guidance.json` | 16 | All guidance articles translated to English |
+
+### Files NOT Requiring Translation
+
+| File | Reason |
+|---|---|
+| `data/org-settings.json` | Config only (booleans, numbers, empty strings) |
+| `data/rbac_users.json` | User accounts; email domains already English |
+| `data/soa.json` | Control IDs and technical terms (ISO/BSI/NIS2) — language-neutral |
+| `data/gdpr/incidents.json` | Empty array (seed data) |
+| `data/gdpr/dsar.json` | Empty array (seed data) |
+| `data/gdpr/dsb.json` | Config only (empty string fields) |
+| `data/audit-log.json` | Runtime log, gitignored |
+| `data/embeddings.json` | AI embedding vectors, gitignored |
+
+### Terminology Mapping (DE → EN)
+
+| German | English |
+|---|---|
+| DSGVO | GDPR |
+| Datenschutzbeauftragter (DSB) | Data Protection Officer (DPO) |
+| Auftragsverarbeitung / AV | Data Processing Agreement (DPA) |
+| Verarbeitungsverzeichnis / VVT | Records of Processing Activities (RoPA) |
+| Datenschutz-Folgenabschätzung / DSFA | Data Protection Impact Assessment (DPIA) |
+| Technische und organisatorische Maßnahmen (TOMs) | Technical and Organisational Measures (TOMs) |
+| Richtlinie | Policy |
+| Verfahren | Procedure |
+| Schulung | Training |
+| Lieferkette | Supply Chain |
+
+### Conventions
+
+- **Company legal suffixes**: "GmbH" kept as-is (internationally understood)
+- **Control IDs**: `ISO-5.1`, `NIS2-a`, `BSI-ORP.3` etc. — unchanged
+- **Status/enum values**: `draft`, `approved`, `active`, etc. — unchanged (already English)
+- **Technical field names**: unchanged
+
+
+## 42. Offline-First / No External Requests (V 1.30)
+
+### Motivation
+
+No user data or metadata must leave the server when loading the UI. All previously CDN-loaded assets are now bundled locally under `ui/vendor/`.
+
+### Vendored Libraries
+
+| Library | Version | Files | Size |
+|---|---|---|---|
+| `@phosphor-icons/web` | 2.1.1 | `vendor/phosphor-regular.css`, `vendor/Phosphor.woff2`, `vendor/Phosphor.woff`, `vendor/Phosphor.ttf` | ~635 KB |
+| `marked` | latest (min) | `vendor/marked.min.js` | ~39 KB |
+
+### Changes
+
+| File | Change |
+|---|---|
+| `ui/login.html` | `<link>` → `vendor/phosphor-regular.css` (was CDN) |
+| `ui/index.html` | `<link>` → `vendor/phosphor-regular.css` (was CDN) |
+| `ui/index.html` | `<script>` → `vendor/marked.min.js` (was CDN) |
+
+### Result
+
+- Zero external HTTP requests on page load
+- No DNS lookups to `cdn.jsdelivr.net` or similar
+- Application fully usable in air-gapped / offline environments
+- GDPR-compliant: no IP addresses forwarded to third-party CDN operators
+
+## 43. Mehrsprachige Demo-Bundles (V 1.31)
+
+### Übersicht
+
+ISMS Builder liefert vier vollständige Demo-Datenpakete in unterschiedlichen Sprachen. Beim ersten Admin-Login nach einem Demo-Reset erscheint ein Overlay, in dem die Sprache gewählt wird. Die Daten werden daraufhin serverseitig eingespielt.
+
+### Verfügbare Sprachen
+
+| Code | Sprache | Datei | Größe |
+|------|---------|-------|-------|
+| `de` | Deutsch | `data/demo-bundles/de.json` | ~70 KB |
+| `en` | English | `data/demo-bundles/en.json` | ~152 KB |
+| `fr` | Français | `data/demo-bundles/fr.json` | ~67 KB |
+| `nl` | Nederlands | `data/demo-bundles/nl.json` | ~45 KB |
+
+### Bundle-Inhalt (pro Sprache)
+
+| Modul | DE | EN | FR | NL |
+|-------|----|----|----|----|
+| Risiken | 8 | 12 | 8 | 8 |
+| Sicherheitsziele | 4 | 4 | 4 | 4 |
+| Training | 4 | 3 | 3 | 3 |
+| Assets | 5 | 8 | 5 | 5 |
+| Lieferanten | 4 | 10 | 4 | 4 |
+| Templates | 3 | 4 | 3 | 3 |
+| Guidance | 2 | 3 | 2 | 2 |
+| Öffentliche Vorfälle | 3 | 10 | 3 | 3 |
+| BCM (BIA/Plans/Exercises) | 4/2/2 | 8/7/6 | 4/2/2 | 3/2/2 |
+| GDPR (VVT/TOMs/AV/DSFA) | 3/5/1/1 | 3/5/1/1 | 3/5/1/1 | 3/5/1/1 |
+| Legal (Verträge/NDAs/Policies) | 3/2/2 | 3/2/2 | 3/2/2 | 3/2/2 |
+
+### Bundle-Struktur (JSON)
+
+```json
+{
+  "exportedAt": "ISO-8601",
+  "version": "1.30",
+  "lang": "de|en|fr|nl",
+  "files": {
+    "risks.json": [...],
+    "goals.json": [...],
+    "training.json": [...],
+    "assets.json": [...],
+    "suppliers.json": [...],
+    "templates.json": [...],
+    "guidance.json": [...],
+    "public-incidents.json": [...],
+    "bcm.json": { "bia": [...], "plans": [...], "exercises": [...] },
+    "governance.json": { "reviews": [...], "actions": [...], "meetings": [...] }
+  },
+  "gdpr": {
+    "vvt.json": [...], "toms.json": [...], "av.json": [...],
+    "dsfa.json": [...], "dsar.json": [...], "incidents.json": [...], "deletionLog.json": []
+  },
+  "legal": {
+    "contracts.json": [...], "ndas.json": [...], "privacy-policies.json": [...]
+  }
+}
+```
+
+### Geschützte Dateien (werden beim Bundle-Import nicht überschrieben)
+
+`soa.json`, `custom-lists.json`, `org-settings.json`, `rbac_users.json`
+
+### API-Endpunkt
+
+| Route | Auth | Body | Beschreibung |
+|-------|------|------|--------------|
+| `POST /admin/demo-load-bundle` | admin | `{ "lang": "de\|en\|fr\|nl\|skip" }` | Lädt serverseitiges Bundle; `skip` startet leer |
+
+Nach dem Import wird `data/.demo_lang_set` geschrieben. Beim nächsten Demo-Reset wird diese Datei gelöscht — das Overlay erscheint beim darauffolgenden Admin-Login erneut.
+
+### Bundles regenerieren
+
+```bash
+node scripts/fix-demo-bundles.js
+```
+
+Das Script liest die bestehenden EN/DE/FR-Bundles, fixiert Inhalt und erzeugt `nl.json` neu. Alle 4 Bundles werden in `data/demo-bundles/` gespeichert.
+
+### UI (Login-Seite)
+
+Das Sprach-Overlay (`#demoLangOverlay`) öffnet automatisch nach dem ersten Admin-Login post Demo-Reset (wenn `data/.demo_lang_set` nicht existiert). Vier Flag-Buttons (🇩🇪 🇬🇧 🇫🇷 🇳🇱) plus „Skip"-Option. Nach Auswahl erfolgt Redirect zu `/ui/index.html`.
+
+### Relevante Dateien
+
+| Datei | Zweck |
+|-------|-------|
+| `data/demo-bundles/de.json` | Deutsches Demo-Bundle |
+| `data/demo-bundles/en.json` | Englisches Demo-Bundle |
+| `data/demo-bundles/fr.json` | Französisches Demo-Bundle |
+| `data/demo-bundles/nl.json` | Niederländisches Demo-Bundle |
+| `scripts/fix-demo-bundles.js` | Bundle-Generator/Fixer |
+| `server/routes/admin.js` | `POST /admin/demo-load-bundle` |
+| `ui/login.html` | Sprach-Overlay HTML + JS |
+
+## 44. Guidance – Vollständige Seed-Struktur & i18n (V 1.31)
+
+### Übersicht
+
+Guidance enthält fünf Kategorien. Alle seeded Dokumente sind **sprachabhängig** (DE / EN) und werden bei jedem Serverstart sowie nach Demo-Bundle-Import automatisch angelegt oder aktualisiert (idempotent).
+
+### Kategorien und Seed-Inhalte
+
+| Kategorie | Sichtbarkeit | Seed-Dokumente |
+|---|---|---|
+| `systemhandbuch` | alle Rollen | Demo-Betrieb / Demo Mode (seedDemoDoc) |
+| `rollen` | alle Rollen | CISO, DSB/DPO, Revision/Audit, QMB/QMO, Abteilungsleiter/Dept Head (seedRoleGuides) |
+| `policy-prozesse` | alle Rollen | Policy-Prozesse – Erstellen, Prüfen & Freigeben / Policy Processes – Create, Review & Approve (seedPolicyGuide) |
+| `soa-audit` | alle Rollen | SoA & Audit – Leitfaden / SoA & Audit – Guide (seedSoaGuide) |
+| `admin-intern` | admin only | README, CONTRIBUTING, C4-Diagramme, Datenmodell, OpenAPI (seedArchitectureDocs) |
+
+### Sprach-Awareness (`_getDemoLang`)
+
+Alle Seed-Funktionen lesen `data/.demo_lang_set` (geschrieben von `POST /admin/demo-load-bundle`):
+
+```js
+function _getDemoLang() {
+  // liest data/.demo_lang_set → { lang: 'de'|'en'|'fr'|'nl' }
+  // fr und nl → fallen auf 'en' zurück
+  // default wenn Datei fehlt: 'en'
+}
+```
+
+Jedes seeded Dokument hat ein `seedLang`-Feld. Wenn `_getDemoLang()` eine andere Sprache zurückgibt als `seedLang`, werden Titel und Inhalt automatisch in die neue Sprache aktualisiert.
+
+### Seed-Funktionen
+
+| Funktion | Kategorie | seedId | Verhalten |
+|---|---|---|---|
+| `seedDemoDoc()` | systemhandbuch | `seed_demo_overview` | DE/EN, pinOrder 1 |
+| `seedRoleGuides()` | rollen | `seed_guide_ciso` u.a. (5 Guides) | DE/EN, Migration von systemhandbuch |
+| `seedSoaGuide()` | soa-audit | `seed_soa_audit_guide` | DE/EN |
+| `seedPolicyGuide()` | policy-prozesse | `seed_policy_prozesse_guide` | DE/EN |
+| `seedArchitectureDocs()` | admin-intern | `seed_readme` u.a. | liest MD-Dateien, sprachneutral |
+
+### Aufruf-Reihenfolge
+
+**Serverstart** (`server/index.js`):
+```
+seedArchitectureDocs → seedDemoDoc → seedRoleGuides → seedSoaGuide → seedPolicyGuide
+```
+
+**Nach Bundle-Import** (`POST /admin/demo-load-bundle` + `POST /admin/demo-import`):
+Gleiche Reihenfolge — stellt sicher dass alle Docs sofort verfügbar sind, ohne Server-Neustart.
+
+### Migration bestehender Instanzen
+
+`seedRoleGuides()` enthält eine automatische Migration: Docs die fälschlicherweise in `systemhandbuch` gespeichert wurden (alte Bug-Version), werden beim nächsten Serverstart nach `rollen` verschoben.
+
+### Relevante Dateien
+
+| Datei | Änderung |
+|---|---|
+| `server/db/guidanceStore.js` | `_getDemoLang()`, `_upsertSeed()`, `seedSoaGuide()`, `seedPolicyGuide()`, `seedDemoDocI18n()`, `seedRoleGuidesI18n()`, bilingualer Content |
+| `server/index.js` | `seedSoaGuide()` + `seedPolicyGuide()` beim Start |
+| `server/routes/admin.js` | Alle 5 Seeds nach Bundle-Import |
+
+---
+
+## 45. Bugfixes (V 1.31)
+
+### Login-Logo (Wappen) nicht sichtbar
+
+**Ursache:** `vendor/`-Verzeichnis (Phosphor-Schriften, marked.js) war nicht in `PUBLIC_UI_FILES` eingetragen. Der Auth-Middleware-Check blockierte Anfragen an `/ui/vendor/*` vor dem Login — die Schrift konnte nicht geladen werden, das Shield-Icon blieb unsichtbar.
+
+**Fix** (`server/index.js`):
+```js
+// vendor/ assets (fonts, icons) are public — required by login page before auth
+if (req.path.startsWith('/vendor/')) return uiStatic(req, res, next)
+```
+
+### Heatmap – Risiko-Seitenleiste
+
+**Vorher:** Die Heatmap zeigte nur ein 5×5-Farbgitter mit Punkten in den Zellen. Eine Seitenleiste mit allen Risiken fehlte.
+
+**Neu:** Unterhalb der Heatmap wird eine vollständige **Risiko-Liste** angezeigt:
+- Alle Risiken sortiert nach Score absteigend
+- Farbiges Score-Badge (hm-low / hm-medium / hm-high / hm-critical)
+- Klickbar → öffnet Risiko-Detailpanel
+- Owner-Anzeige
+- CSS-Klassen: `.heatmap-risk-list`, `.hm-list-item`, `.hm-list-badge`, `.hm-list-title`, `.hm-list-owner`
+
+**Geänderte Dateien:** `ui/app.js` (renderRiskHeatmap), `ui/style.css`
+
+### Guidance-Seeds nach Bundle-Import fehlend
+
+**Ursache:** `POST /admin/demo-load-bundle` und `POST /admin/demo-import` überschrieben `guidance.json` mit den 2–3 Bundle-Docs. Die Seeds liefen nur beim Serverstart.
+
+**Fix:** Beide Routes rufen nach dem Import alle 5 Seed-Funktionen auf — Docs sind sofort ohne Neustart verfügbar.

@@ -1,4 +1,4 @@
-/* © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0 */
+/* © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0 */
 /* ═══════════════════════════════════════════════════════════
    ISMS Builder – Design System  (Atlassian Dark)
    ═══════════════════════════════════════════════════════════ */
@@ -415,6 +415,8 @@ hr { border: none; border-top: 1px solid var(--border); margin: 0; }
 .soa-kpi-blue  { color: var(--accent-text); border-color: var(--accent-subtle); background: var(--accent-subtle); }
 .btn-export { padding: 5px 14px; border-radius: var(--radius-md); background: var(--surface-overlay); color: var(--accent-text); text-decoration: none; font-size: 12px; border: 1px solid var(--border); margin-left: auto; transition: background .15s; }
 .btn-export:hover { background: var(--accent-subtle); text-decoration: none; }
+.btn-import-iso { padding: 5px 14px; border-radius: var(--radius-md); background: rgba(227,179,65,.12); color: #e3b341; font-size: 12px; border: 1px solid rgba(227,179,65,.4); cursor: pointer; font-family: inherit; transition: background .15s; white-space: nowrap; }
+.btn-import-iso:hover { background: rgba(227,179,65,.22); }
 .soa-fw-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .soa-fw-tab { padding: 5px 16px; border-radius: 20px; border: 1px solid var(--fw-color, var(--border)); background: transparent; color: var(--fw-color, var(--text-subtle)); font-size: 12px; font-weight: 500; cursor: pointer; transition: background .15s; }
 .soa-fw-tab:hover { background: color-mix(in srgb, var(--fw-color, #888) 15%, transparent); }
@@ -1082,6 +1084,81 @@ hr { border: none; border-top: 1px solid var(--border); margin: 0; }
 }
 .heatmap-hint { font-size: 12px; color: var(--text-subtle); }
 
+/* ── Heatmap risk list (right panel) ── */
+.heatmap-risk-list {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  max-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+.heatmap-risk-list-header {
+  background: var(--surface2);
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-subtle);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.hm-list-count {
+  background: var(--surface3);
+  color: var(--text-muted);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+}
+.heatmap-risk-list-body {
+  overflow-y: auto;
+  flex: 1;
+}
+.hm-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .12s;
+}
+.hm-list-item:last-child { border-bottom: none; }
+.hm-list-item:hover { background: var(--surface2); }
+.hm-list-badge {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.hm-list-title {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hm-list-owner {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-subtle);
+  max-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Treatment plan cards ── */
 .risk-tp-card {
   background: var(--surface); border: 1px solid var(--border);
@@ -1396,6 +1473,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 0; }
   margin: 0 0 14px;
 }
 .guidance-md pre code { background: none; border: none; padding: 0; }
+.guidance-md img { max-width: 100%; height: auto; border-radius: var(--radius-md); }
 .guidance-md table {
   border-collapse: collapse;
   width: 100%;

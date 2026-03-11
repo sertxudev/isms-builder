@@ -18,28 +18,6 @@
       "Settings"
     ]
   },
-  "alice": {
-    "username": "alice",
-    "email": "alice@it.example",
-    "domain": "IT",
-    "role": "dept_head",
-    "passwordHash": "$2a$12$Ipt22Y0IbWf2Thszb7ftoe36FQ85A2dsK.93a5rBuc.563SZnKUty",
-    "totpSecret": "",
-    "sections": [
-      "Guidance",
-      "Risk",
-      "Incident"
-    ]
-  },
-  "bob": {
-    "username": "bob",
-    "email": "bob@hr.example",
-    "domain": "HR",
-    "role": "reader",
-    "passwordHash": "$2a$12$KKF.RmVsL5a4MbR31qN0tO7/wJEm2R1jHcv2qYA36.UCYK3IJwc5q",
-    "totpSecret": "",
-    "sections": []
-  },
   "ciso": {
     "username": "ciso",
     "email": "ciso@example.com",
@@ -63,5 +41,27 @@
     "passwordHash": "$2a$12$BIrlbtukFfEIYhKB/HGaruritY85dmbnXtzqyzTTxS3B8f54Rg1cm",
     "totpSecret": "",
     "sections": []
+  },
+  "alice": {
+    "username": "alice",
+    "email": "alice@it.example",
+    "domain": "IT",
+    "role": "dept_head",
+    "functions": [],
+    "passwordHash": "$2a$12$ABXMIh2k7DS2gWebXAYa8.hP5ouXWFdLrHtYiW9AsimGrVEjRlWP2",
+    "totpSecret": null,
+    "sections": [],
+    "totpVerified": false
+  },
+  "bob": {
+    "username": "bob",
+    "email": "bob@hr.example",
+    "domain": "HR",
+    "role": "reader",
+    "functions": [],
+    "passwordHash": "$2a$12$SGHc.QCEN7BkCMqKJp7sbelp7uHU13axXb9yGvH1JSlG8CKd4twvm",
+    "totpSecret": null,
+    "sections": [],
+    "totpVerified": false
   }
 }

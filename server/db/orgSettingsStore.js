@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 // Persistent store for organisation-wide settings and role-specific config.
 // Data saved to data/org-settings.json
 
@@ -112,6 +112,12 @@ const DEFAULTS = {
     user:   '',
     pass:   '',      // Achtung: im Klartext in org-settings.json gespeichert
     from:   '',      // z.B. "ISMS Builder <isms@example.com>"
+  },
+
+  // Login-Splash-Bildschirm
+  splashScreen: {
+    enabled:  true,   // Splash nach Login anzeigen
+    duration: 7,      // Anzeigedauer in Sekunden (1–30)
   },
 
   // Navigations-Reihenfolge (array der Section-IDs; fehlende landen am Ende)

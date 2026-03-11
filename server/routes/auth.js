@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 'use strict'
 const express = require('express')
 const router = express.Router()
@@ -6,12 +6,18 @@ const fs = require('fs')
 const path = require('path')
 const { requireAuth, authorize, signToken, getSessionFromReq } = require('../auth')
 
-const DATA_DIR  = process.env.DATA_DIR || path.join(__dirname, '../../data')
-const FLAG_FILE = path.join(DATA_DIR, '.demo_reset_done')
+const DATA_DIR       = process.env.DATA_DIR || path.join(__dirname, '../../data')
+const FLAG_FILE      = path.join(DATA_DIR, '.demo_reset_done')
+const DEMO_LANG_FILE = path.join(DATA_DIR, '.demo_lang_set')
 
 // ── Demo-Reset-Status (öffentlich, kein Login erforderlich) ──
 router.get('/auth/demo-reset-done', (req, res) => {
   res.json({ active: fs.existsSync(FLAG_FILE) })
+})
+
+// ── Demo-Sprache nötig? (öffentlich) ──
+router.get('/auth/demo-lang-needed', (req, res) => {
+  res.json({ needed: !fs.existsSync(DEMO_LANG_FILE) })
 })
 
 // Login
@@ -74,7 +80,10 @@ router.post('/login', async (req, res) => {
     try { fs.unlinkSync(FLAG_FILE) } catch {}
   }
 
-  return res.json({ username: userRaw.username, role: userRaw.role, domain: userRaw.domain, functions, has2FA })
+  // Admin-Erstlogin: Demo-Sprache noch nicht gewählt?
+  const needsDemoLang = userRaw.role === 'admin' && !fs.existsSync(DEMO_LANG_FILE)
+
+  return res.json({ username: userRaw.username, role: userRaw.role, domain: userRaw.domain, functions, has2FA, needsDemoLang })
 })
 
 // Who am I

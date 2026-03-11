@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 // crossmapStore.js – Cross-Framework Control Mapping
 // Bildet thematische Gruppen zwischen Controls verschiedener Frameworks ab.
 // Speicherung in data/crossmap.json (überschreibbar; Seeds dienen als Default)

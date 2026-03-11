@@ -1,4 +1,4 @@
-<!-- © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0 — https://www.gnu.org/licenses/agpl-3.0.html -->
+<!-- © 2026 Claude Hecker — ISMS Builder V 1.31 — AGPL-3.0 — https://www.gnu.org/licenses/agpl-3.0.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -115,6 +115,15 @@
     align-items: flex-start;
     gap: 0;
   }
+  .slide-title-banner {
+    background-image: url('../../isms-builder-banner.png');
+    background-size: cover; background-position: center top; background-repeat: no-repeat;
+  }
+  .slide-title-banner::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(7,12,22,.78); z-index: 0;
+  }
+  .slide-title-banner > * { position: relative; z-index: 1; }
   .slide-title .overline {
     font-size: 13px;
     letter-spacing: 3px;
@@ -399,9 +408,9 @@
 <div class="deck" id="deck">
 
   <!-- ── 1. TITEL ───────────────────────────────────────────── -->
-  <div class="slide slide-title active" id="s1">
+  <div class="slide slide-title slide-title-banner active" id="s1">
     <div class="title-deco"></div>
-    <div class="overline">Open-Source ISMS Platform</div>
+    <div class="overline">Open-Source ISMS Platform · V 1.31</div>
     <h1>ISMS<br><span>Builder</span></h1>
     <p class="subtitle">
       Integriertes Informationssicherheits-Managementsystem für KMU und Konzerne —
@@ -410,7 +419,7 @@
     <div class="meta">
       <div class="meta-item">
         <span class="label">Version</span>
-        <span class="value">V 1.28</span>
+        <span class="value">V 1.31</span>
       </div>
       <div class="meta-item">
         <span class="label">Lizenz</span>
@@ -423,6 +432,57 @@
       <div class="meta-item">
         <span class="label">Module</span>
         <span class="value">16 integrierte Module</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NEU: V 1.31 ÄNDERUNGEN ────────────────────────────── -->
+  <div class="slide slide-content" id="s1b">
+    <h2><span class="icon">🆕</span> Neu in V 1.31</h2>
+    <div class="cols cols-2" style="flex:1;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card blue">
+          <h3>🌍 Mehrsprachige Demo-Bundles</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li>4 vollständige Sprachpakete: 🇩🇪 DE · 🇬🇧 EN · 🇫🇷 FR · 🇳🇱 NL</li>
+            <li>Beim Erst-Login: Sprachauswahl-Overlay (Sprach-Picker)</li>
+            <li>Alle Module mit realistischen Demodaten je Sprache</li>
+            <li>EN: 12 Risiken, 4 Ziele, 8 Assets, 10 Lieferanten, Legal</li>
+            <li>DE/FR/NL: 8 Risiken, 4 Ziele, 5 Assets, 4 Lieferanten, Legal</li>
+            <li>Guidance-Seeds reagieren auf Sprachwahl (DE ↔ EN)</li>
+          </ul>
+        </div>
+        <div class="card green">
+          <h3>📚 Erweiterte Guidance-Inhalte</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li>Neue Kategorie <strong>SoA & Audit</strong> — vollständiger SoA-Leitfaden</li>
+            <li>Neue Kategorie <strong>Policy-Prozesse</strong> — Richtlinien-Lebenszyklus</li>
+            <li>Alle 5 Rollenanleitungen in Deutsch und Englisch</li>
+            <li>Sprachsensitive Seeds: Inhalt wechselt automatisch mit Bundle</li>
+            <li>Vollständige Architekturdokumentation jetzt in Guidance (admin-intern)</li>
+            <li>Seeds laufen nach Bundle-Import ohne Server-Neustart</li>
+          </ul>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card orange">
+          <h3>🐛 Bugfixes</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li><strong>Login-Logo (Wappen) unsichtbar</strong> — vendor/-Pfad war hinter Auth-Middleware; jetzt öffentlich zugänglich</li>
+            <li><strong>Guidance nach Bundle-Import leer</strong> — Seeds liefen nur beim Serverstart; jetzt auch nach jedem Import</li>
+            <li><strong>Heatmap-Seitenleiste fehlend</strong> — Risiko-Liste rechts neben Grid ergänzt (nach Score sortiert)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🎨 Login-Seite</h3>
+          <ul class="check" style="gap:7px;font-size:13px;">
+            <li>ISMS Builder Banner als Hintergrundbild</li>
+            <li>Dunkle Überlagerung für optimale Lesbarkeit</li>
+          </ul>
+        </div>
+        <div class="highlight green">
+          <strong>176 / 176 Tests</strong> — alle Tests grün nach allen Änderungen.
+        </div>
       </div>
     </div>
   </div>
@@ -1228,6 +1288,8 @@ node server/index.js</pre>
           <li>Docker-Deployment</li>
           <li>176 automatisierte Tests</li>
           <li>OpenAPI 3.0 Dokumentation</li>
+          <li>Semantische Suche (Ollama)</li>
+          <li>Mehrsprachige Demo-Bundles (DE/EN/FR/NL)</li>
         </ul>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
@@ -1267,15 +1329,19 @@ node server/index.js</pre>
     </div>
   </div>
 
-  <!-- ── 17. ABSCHLUSS ──────────────────────────────────────── -->
-  <div class="slide slide-title" id="s17">
+  <!-- ── ABSCHLUSS ──────────────────────────────────────────── -->
+  <div class="slide slide-title slide-title-banner" id="s_end">
     <div class="title-deco"></div>
     <div class="overline">Fragen & Diskussion</div>
     <h1>Danke<br><span>für Ihre</span><br>Aufmerksamkeit</h1>
     <p class="subtitle">
-      ISMS Builder — die Open-Source-Plattform für praxisnahes Informationssicherheitsmanagement.
+      ISMS Builder V 1.31 — die Open-Source-Plattform für praxisnahes Informationssicherheitsmanagement.
     </p>
     <div class="meta">
+      <div class="meta-item">
+        <span class="label">Version</span>
+        <span class="value">V 1.31</span>
+      </div>
       <div class="meta-item">
         <span class="label">Module</span>
         <span class="value">16 integriert</span>
@@ -1289,6 +1355,10 @@ node server/index.js</pre>
         <span class="value">176 / 176 ✓</span>
       </div>
       <div class="meta-item">
+        <span class="label">Demo-Sprachen</span>
+        <span class="value">🇩🇪 🇬🇧 🇫🇷 🇳🇱</span>
+      </div>
+      <div class="meta-item">
         <span class="label">Lizenz</span>
         <span class="value">AGPL-3.0</span>
       </div>
@@ -1298,7 +1368,7 @@ node server/index.js</pre>
 </div><!-- /deck -->
 
 <!-- ── Copyright ──────────────────────────────────────────── -->
-<div id="copyright">© 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0</div>
+<div id="copyright">© 2026 Claude Hecker — ISMS Builder V 1.31 — AGPL-3.0</div>
 
 <!-- ── Navigation ─────────────────────────────────────────── -->
 <div class="nav">

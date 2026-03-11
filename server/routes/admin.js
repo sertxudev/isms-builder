@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 'use strict'
 const express = require('express')
 const router = express.Router()
@@ -13,8 +13,10 @@ const mailer           = require('../mailer')
 
 function nowISO() { return new Date().toISOString() }
 
-const DATA_DIR   = process.env.DATA_DIR || path.join(__dirname, '../../data')
-const FLAG_FILE  = path.join(DATA_DIR, '.demo_reset_done')
+const DATA_DIR        = process.env.DATA_DIR || path.join(__dirname, '../../data')
+const FLAG_FILE       = path.join(DATA_DIR, '.demo_reset_done')
+const DEMO_LANG_FILE  = path.join(DATA_DIR, '.demo_lang_set')
+const BUNDLES_DIR     = path.join(__dirname, '../../data/demo-bundles')
 
 function buildFullExport(dataDir) {
   const jsonFiles = [
@@ -399,8 +401,9 @@ router.post('/admin/demo-reset', requireAuth, authorize('admin'), async (req, re
     await rbac.setPasswordHash('admin', 'adminpass')
     rbac.setUserTotpSecret('admin', null)
 
-    // Write demo-reset flag
+    // Write demo-reset flag; remove demo-lang flag so next admin login can pick language again
     fs.writeFileSync(FLAG_FILE, nowISO())
+    if (fs.existsSync(DEMO_LANG_FILE)) try { fs.unlinkSync(DEMO_LANG_FILE) } catch {}
 
     // Auf SQLite-Backend umstellen (falls noch nicht gesetzt)
     const envFile = path.join(__dirname, '../../.env')
@@ -492,8 +495,97 @@ router.post('/admin/demo-import', requireAuth, authorize('admin'), express.json(
     // Remove demo-reset flag if present
     if (fs.existsSync(FLAG_FILE)) fs.unlinkSync(FLAG_FILE)
 
+    // Re-seed guidance docs (architecture, demo-overview, role guides, soa-guide, policy-guide)
+    try {
+      const gs = require('../db/guidanceStore')
+      gs.seedArchitectureDocs()
+      gs.seedDemoDoc()
+      gs.seedRoleGuides()
+      gs.seedSoaGuide()
+      gs.seedPolicyGuide()
+      gs.seedIsoNotice()
+    } catch {}
+
     auditStore.append({ user: req.user, action: 'demo_import', resource: 'org', detail: 'Demo-Daten importiert — alice/bob wiederhergestellt' })
     res.json({ ok: true, restoredAt: nowISO() })
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})
+
+// ── Demo-Bundle aus Server-Datei laden (First-Login-Sprachauswahl) ──
+router.post('/admin/demo-load-bundle', requireAuth, authorize('admin'), express.json(), async (req, res) => {
+  try {
+    const { lang } = req.body || {}
+    const SUPPORTED = ['de', 'en', 'fr', 'nl']
+
+    // Mark lang as set regardless of whether data is loaded (skip = no data, just flag)
+    fs.writeFileSync(DEMO_LANG_FILE, JSON.stringify({ lang: lang || 'skip', setAt: nowISO() }))
+
+    if (!lang || lang === 'skip') {
+      return res.json({ ok: true, skipped: true })
+    }
+    if (!SUPPORTED.includes(lang)) {
+      return res.status(400).json({ error: 'Unsupported language. Use: de, en, fr, nl' })
+    }
+
+    const bundleFile = path.join(BUNDLES_DIR, `${lang}.json`)
+    if (!fs.existsSync(bundleFile)) {
+      return res.status(404).json({ error: `Demo bundle for '${lang}' not found` })
+    }
+
+    const bundle = JSON.parse(fs.readFileSync(bundleFile, 'utf8'))
+    const dataDir = DATA_DIR
+    const protectedFiles = new Set(['soa.json', 'custom-lists.json', 'org-settings.json', 'rbac_users.json'])
+
+    if (bundle.files && typeof bundle.files === 'object') {
+      for (const [filename, content] of Object.entries(bundle.files)) {
+        if (protectedFiles.has(filename)) continue
+        fs.writeFileSync(path.join(dataDir, filename), JSON.stringify(content, null, 2))
+      }
+    }
+
+    const gdprDir = path.join(dataDir, 'gdpr')
+    if (bundle.gdpr && typeof bundle.gdpr === 'object') {
+      if (!fs.existsSync(gdprDir)) fs.mkdirSync(gdprDir, { recursive: true })
+      for (const [filename, content] of Object.entries(bundle.gdpr)) {
+        fs.writeFileSync(path.join(gdprDir, filename), JSON.stringify(content, null, 2))
+      }
+    }
+
+    const legalDir = path.join(dataDir, 'legal')
+    if (bundle.legal && typeof bundle.legal === 'object') {
+      if (!fs.existsSync(legalDir)) fs.mkdirSync(legalDir, { recursive: true })
+      for (const [filename, content] of Object.entries(bundle.legal)) {
+        fs.writeFileSync(path.join(legalDir, filename), JSON.stringify(content, null, 2))
+      }
+    }
+
+    // Recreate demo users alice and bob
+    const rbac = require('../rbacStore')
+    const demoUsers = [
+      { username: 'alice', email: 'alice@it.example', domain: 'IT', role: 'dept_head', functions: [], password: 'alicepass', sections: ['Guidance','Risk'] },
+      { username: 'bob',   email: 'bob@hr.example',   domain: 'HR', role: 'reader',   functions: [], password: 'bobpass',   sections: [] },
+    ]
+    for (const du of demoUsers) {
+      if (rbac.getUserByUsername(du.username)) rbac.deleteUser(du.username)
+      await rbac.createUser({ username: du.username, email: du.email, domain: du.domain, role: du.role, functions: du.functions, password: du.password })
+      rbac.setUserTotpSecret(du.username, null)
+    }
+
+    // Re-seed guidance docs (architecture, demo-overview, role guides, soa-guide, policy-guide)
+    try {
+      const gs = require('../db/guidanceStore')
+      gs.seedArchitectureDocs()
+      gs.seedDemoDoc()
+      gs.seedRoleGuides()
+      gs.seedSoaGuide()
+      gs.seedPolicyGuide()
+      gs.seedIsoNotice()
+    } catch {}
+
+    auditStore.append({ user: req.user, action: 'demo_import', resource: 'org', detail: `Demo-Bundle '${lang}' geladen` })
+    res.json({ ok: true, lang, loadedAt: nowISO() })
   } catch (e) {
     res.status(500).json({ error: e.message })
   }

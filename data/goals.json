@@ -1,0 +1,86 @@
+[
+  {
+    "id": "goal_demo_de_001",
+    "title": "Patching-Rate auf 95% erhöhen",
+    "description": "Erreichung und Aufrechterhaltung einer Patch-Compliance-Rate von 95% über alle verwalteten Systeme innerhalb von 90 Tagen nach Patch-Veröffentlichung.",
+    "owner": "IT-Betrieb",
+    "dueDate": "2026-06-30",
+    "reviewDate": "2026-04-01",
+    "status": "in_progress",
+    "priority": "high",
+    "targetValue": 95,
+    "currentValue": 84,
+    "unit": "%",
+    "linkedControls": [
+      "NIS2-a",
+      "BSI-OPS.1.1"
+    ],
+    "linkedPolicies": [],
+    "createdAt": "2026-01-01T09:00:00.000Z",
+    "updatedAt": "2026-03-01T09:00:00.000Z",
+    "createdBy": "admin"
+  },
+  {
+    "id": "goal_demo_de_002",
+    "title": "2FA für alle Admin-Konten einführen",
+    "description": "Durchsetzung von Mehr-Faktor-Authentisierung für alle privilegierten (Admin-)Konten bis Ende Q2.",
+    "owner": "CISO",
+    "dueDate": "2026-04-30",
+    "reviewDate": "2026-05-01",
+    "status": "in_progress",
+    "priority": "critical",
+    "targetValue": 100,
+    "currentValue": 72,
+    "unit": "%",
+    "linkedControls": [
+      "NIS2-a",
+      "EUCS-GOV.3"
+    ],
+    "linkedPolicies": [],
+    "createdAt": "2026-01-01T09:00:00.000Z",
+    "updatedAt": "2026-03-01T09:00:00.000Z",
+    "createdBy": "admin"
+  },
+  {
+    "id": "goal_demo_de_003",
+    "title": "ISO 27001-Zertifizierung erreichen",
+    "description": "Abschluss von Stage-1- und Stage-2-Audit durch externen Zertifizierer (TÜV Rheinland) und Erhalt des ISO 27001-Zertifikats.",
+    "owner": "CISO",
+    "dueDate": "2026-09-30",
+    "reviewDate": "2026-09-30",
+    "status": "open",
+    "priority": "critical",
+    "targetValue": 1,
+    "currentValue": 0,
+    "unit": "Zertifikat",
+    "linkedControls": [
+      "NIS2-a",
+      "BSI-ORP.1"
+    ],
+    "linkedPolicies": [],
+    "createdAt": "2026-01-01T09:00:00.000Z",
+    "updatedAt": "2026-01-01T09:00:00.000Z",
+    "createdBy": "admin"
+  },
+  {
+    "id": "goal_demo_de_004",
+    "title": "Phishing-Klickrate unter 5% senken",
+    "description": "Reduzierung der Mitarbeiter-Klickrate in simulierten Phishing-Kampagnen von aktuell 14% auf unter 5% durch gezieltes Awareness-Training.",
+    "owner": "IT-Sicherheit",
+    "dueDate": "2026-12-31",
+    "reviewDate": "2026-09-30",
+    "status": "in_progress",
+    "priority": "high",
+    "targetValue": 5,
+    "currentValue": 14,
+    "unit": "%",
+    "linkedControls": [
+      "NIS2-a",
+      "BSI-ORP.3"
+    ],
+    "linkedPolicies": [],
+    "createdAt": "2026-01-01T09:00:00.000Z",
+    "updatedAt": "2026-03-01T09:00:00.000Z",
+    "createdBy": "admin"
+  }
+]

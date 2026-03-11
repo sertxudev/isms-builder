@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 // Reports module – aggregierte Compliance-Berichte
 // Fünf Report-Typen: compliance, framework, gap, templates, audit
 const soaStore   = require('./db/soaStore')

@@ -1,17 +1,23 @@
 [
   {
-    "id": "av_seed_001",
+    "id": "av_demo_de_001",
     "title": "Microsoft 365 / Azure",
     "processorName": "Microsoft Ireland Limited",
     "processorCountry": "IE",
     "processorContactEmail": "msprivacy@microsoft.com",
     "processingScope": "Cloud-Dienste für E-Mail (Exchange Online), Dokumente (SharePoint/OneDrive), Videokonferenzen (Teams) und Azure-Infrastruktur",
-    "linkedVvt": ["vvt_seed_001", "vvt_seed_002"],
+    "linkedVvt": [
+      "vvt_demo_de_001",
+      "vvt_demo_de_002"
+    ],
     "signatureDate": "2024-01-01",
     "effectiveUntil": "2026-12-31",
     "subProcessors": [
-      { "name": "Microsoft Corporation (USA)", "country": "US", "approved": true },
-      { "name": "LinkedIn Ireland (Backup)", "country": "IE", "approved": true }
+      {
+        "name": "Microsoft Corporation (USA)",
+        "country": "US",
+        "approved": true
+      }
     ],
     "status": "signed",
     "applicableEntities": [],
@@ -28,7 +34,7 @@
     },
     "filePath": null,
     "filename": null,
-    "notes": "Microsoft Data Processing Agreement (DPA) v2024 abgeschlossen. Standard-Vertragsklauseln gemäß EU 2021/914.",
+    "notes": "Microsoft Data Processing Agreement (DPA) v2024 abgeschlossen. Standardvertragsklauseln gemäß EU 2021/914.",
     "createdAt": "2025-01-15T10:00:00.000Z",
     "updatedAt": "2025-01-15T10:00:00.000Z",
     "createdBy": "admin"

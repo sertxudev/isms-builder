@@ -1,12 +1,12 @@
-<!-- © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0 -->
+<!-- © 2026 Claude Hecker — ISMS Builder V 1.30 — AGPL-3.0 -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="generator" content="ISMS Builder V 1.28">
+  <meta name="generator" content="ISMS Builder V 1.30">
   <title>ISMS Builder</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="vendor/phosphor-regular.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -23,7 +23,7 @@
     <div class="topbar-center">
       <div class="topbar-search" id="topbarSearchWrap">
         <i class="ph ph-magnifying-glass"></i>
-        <input type="text" placeholder="Suchen…" class="topbar-search-input" id="topbarSearch" autocomplete="off" />
+        <input type="text" placeholder="Suchen…" class="topbar-search-input" id="topbarSearch" autocomplete="off" data-i18n-placeholder="topbar_search" />
         <div id="searchDropdown" class="search-dropdown" style="display:none;"></div>
       </div>
     </div>
@@ -31,7 +31,7 @@
       <div id="topbarFnBadges" style="display:flex;align-items:center;gap:4px;"></div>
       <button class="topbar-2fa-hint" id="topbar2faHint" style="display:none" title="2FA nicht eingerichtet – jetzt aktivieren" onclick="loadSection('settings')">
         <i class="ph ph-shield-warning"></i>
-        <span>2FA nicht aktiv</span>
+        <span data-i18n="tfa_hint">2FA nicht aktiv</span>
       </button>
       <div class="topbar-user-wrap">
         <button class="topbar-user-btn" id="topbarUserBtn">
@@ -49,10 +49,10 @@
           </div>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item" id="dropdownSettings">
-            <i class="ph ph-gear"></i> Einstellungen
+            <i class="ph ph-gear"></i> <span data-i18n="topbar_settings">Einstellungen</span>
           </button>
           <button class="dropdown-item dropdown-item-danger" id="dropdownLogout">
-            <i class="ph ph-sign-out"></i> Abmelden
+            <i class="ph ph-sign-out"></i> <span data-i18n="topbar_logout">Abmelden</span>
           </button>
         </div>
       </div>
@@ -71,26 +71,26 @@
       <div class="sidebar-create-wrap">
         <button class="sidebar-create-btn" id="btnNewType">
           <i class="ph ph-plus"></i>
-          <span>Erstellen</span>
+          <span data-i18n="sidebar_create">Erstellen</span>
         </button>
       </div>
 
       <nav>
-        <div class="sidebar-section-label">Navigation</div>
+        <div class="sidebar-section-label" data-i18n="sidebar_nav">Navigation</div>
         <ul id="sectionNav" class="sidebar-nav-list"></ul>
       </nav>
 
       <div class="sidebar-divider"></div>
 
       <div>
-        <div class="sidebar-section-label">Template-Typen</div>
+        <div class="sidebar-section-label" data-i18n="sidebar_types">Template-Typen</div>
         <ul id="typeList" class="sidebar-nav-list"></ul>
       </div>
 
       <div class="sidebar-divider"></div>
 
       <div>
-        <div class="sidebar-section-label">Administration</div>
+        <div class="sidebar-section-label" data-i18n="sidebar_admin">Administration</div>
         <ul class="sidebar-nav-list" id="adminNavList"></ul>
       </div>
     </aside>
@@ -197,7 +197,21 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="vendor/marked.min.js"></script>
+  <script src="/ui/i18n/t.js"></script>
+  <script src="/ui/i18n/translations.js"></script>
+  <script>
+    // Apply static data-i18n translations to shell HTML elements
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.dataset.i18n)
+      })
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.dataset.i18nPlaceholder)
+      })
+      document.documentElement.lang = window.LANG || 'de'
+    })
+  </script>
   <script src="/ui/logincheck.js"></script>
   <script src="/ui/login-submit.js"></script>
   <script src="/ui/qr2fa.js"></script>

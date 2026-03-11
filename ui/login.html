@@ -1,11 +1,11 @@
-<!-- © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0 -->
+<!-- © 2026 Claude Hecker — ISMS Builder V 1.30 — AGPL-3.0 -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ISMS Builder – Anmelden</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="vendor/phosphor-regular.css" />
   <style>
     :root {
       --bg:       #1D2125;
@@ -190,9 +190,102 @@
     .inc-confirm p { color: var(--subtle); font-size: 13px; margin: 0 0 6px; }
     .inc-confirm .ref { color: #4C9AFF; font-weight: 700; font-size: 15px; }
     .inc-err { color: #e74c3c; font-size: 13px; text-align: center; margin-top: 4px; display: none; }
+
+    /* ── Language switcher ── */
+    .lang-switcher {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 12px; justify-content: center;
+    }
+    .lang-btn {
+      padding: 4px 12px; border-radius: 20px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--subtle); font-size: 12px; font-weight: 600;
+      font-family: inherit; cursor: pointer; letter-spacing: .04em;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .lang-btn:hover { color: var(--text-inv); border-color: var(--accent); }
+    .lang-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ── Demo-Sprach-Overlay ── */
+    .demo-lang-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.78); z-index: 900;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .demo-lang-overlay.open { display: flex; }
+    .demo-lang-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 36px 40px; width: 480px; max-width: 98vw;
+      box-shadow: 0 16px 64px rgba(0,0,0,.75); text-align: center;
+    }
+    .demo-lang-card h3 {
+      margin: 0 0 8px; font-size: 18px; font-weight: 700; color: #fff;
+    }
+    .demo-lang-card p {
+      margin: 0 0 28px; font-size: 13px; color: var(--subtle); line-height: 1.5;
+    }
+    .demo-lang-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;
+    }
+    .demo-lang-btn {
+      padding: 18px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--raised);
+      color: var(--text-inv); font-family: inherit; font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: border-color .15s, background .15s;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .demo-lang-btn:hover { border-color: var(--accent); background: rgba(0,82,204,.15); }
+    .demo-lang-btn .flag { font-size: 28px; }
+    .demo-lang-skip {
+      background: none; border: none; color: var(--subtle); font-family: inherit;
+      font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 4px;
+    }
+    .demo-lang-skip:hover { color: var(--text); }
+    .demo-lang-loading {
+      display: none; color: var(--subtle); font-size: 13px; margin-top: 8px;
+    }
+
+    /* ── Post-Login Splash Screen ── */
+    #splashOverlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: #0d1117;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 24px;
+    }
+    #splashOverlay.active { display: flex; }
+    #splashOverlay img {
+      max-width: min(520px, 88vw); height: auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 48px rgba(0,0,0,.7);
+    }
+    .splash-progress {
+      width: min(520px, 88vw); height: 4px;
+      background: rgba(255,255,255,.12); border-radius: 2px; overflow: hidden;
+    }
+    .splash-progress-bar {
+      height: 100%; width: 100%;
+      background: linear-gradient(90deg, #0052cc, #4c9aff);
+      border-radius: 2px;
+      transform-origin: left center;
+      transform: scaleX(1);
+      transition: transform linear;
+    }
+    .splash-skip {
+      color: rgba(255,255,255,.35); font-size: 12px; cursor: pointer;
+      background: none; border: none; font-family: inherit;
+      letter-spacing: .04em;
+    }
+    .splash-skip:hover { color: rgba(255,255,255,.6); }
   </style>
 </head>
 <body>
+
+  <!-- Post-Login Splash Screen -->
+  <div id="splashOverlay">
+    <img src="/ui/isms-builder-banner.png" alt="ISMS Builder">
+    <div class="splash-progress"><div class="splash-progress-bar" id="splashBar"></div></div>
+    <button class="splash-skip" onclick="splashDone()">Skip &rarr;</button>
+  </div>
 
   <div class="login-brand">
     <i class="ph ph-shield-check"></i>
@@ -200,45 +293,43 @@
   </div>
 
   <div class="demo-reset-banner" id="demoResetBanner">
-    <b><i class="ph ph-warning"></i> Demo-Modus beendet</b>
-    Das System wurde für den Produktivbetrieb zurückgesetzt. Bitte melden Sie sich mit
-    Benutzername <strong>admin</strong> / Passwort <strong>adminpass</strong> an
-    und ändern Sie das Passwort sofort nach dem ersten Login.
+    <b><i class="ph ph-warning"></i> <span data-i18n="demoResetTitle">Demo-Modus beendet</span></b>
+    <span data-i18n="demoResetText">Das System wurde für den Produktivbetrieb zurückgesetzt. Bitte melden Sie sich mit Benutzername <strong>admin</strong> / Passwort <strong>adminpass</strong> an und ändern Sie das Passwort sofort nach dem ersten Login.</span>
   </div>
 
   <div class="login-card">
-    <h2>Willkommen zurück</h2>
-    <p>Melde dich mit deinen ISMS-Zugangsdaten an.</p>
+    <h2 data-i18n="loginWelcome">Willkommen zurück</h2>
+    <p data-i18n="loginSubtitle">Melde dich mit deinen ISMS-Zugangsdaten an.</p>
 
     <div class="form-group">
-      <label for="email">E-Mail-Adresse</label>
+      <label for="email" data-i18n="loginEmail">E-Mail-Adresse</label>
       <div class="input-wrap">
         <i class="ph ph-envelope input-icon"></i>
-        <input id="email" type="email" placeholder="name@beispiel.de" autocomplete="email" />
+        <input id="email" type="email" data-i18n-placeholder="loginEmailPh" placeholder="name@beispiel.de" autocomplete="email" />
       </div>
     </div>
 
     <div class="form-group">
-      <label for="password">Passwort</label>
+      <label for="password" data-i18n="loginPassword">Passwort</label>
       <div class="input-wrap">
         <i class="ph ph-lock-simple input-icon"></i>
-        <input id="password" type="password" placeholder="Passwort" autocomplete="current-password" />
+        <input id="password" type="password" data-i18n-placeholder="loginPasswordPh" placeholder="Passwort" autocomplete="current-password" />
       </div>
     </div>
 
     <div id="totp-area" class="form-group">
-      <p class="totp-hint"><i class="ph ph-device-mobile"></i> Gib den 6-stelligen Code aus deiner Authenticator-App ein.</p>
+      <p class="totp-hint"><i class="ph ph-device-mobile"></i> <span data-i18n="loginTotpHint">Gib den 6-stelligen Code aus deiner Authenticator-App ein.</span></p>
       <div class="input-wrap">
         <i class="ph ph-keyhole input-icon"></i>
         <input id="totp-input" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" />
       </div>
       <button class="btn-login" id="totp-submit" style="margin-top:10px;">
-        <i class="ph ph-sign-in"></i> Mit 2FA anmelden
+        <i class="ph ph-sign-in"></i> <span data-i18n="loginTotp">Mit 2FA anmelden</span>
       </button>
     </div>
 
     <button class="btn-login" id="loginBtn">
-      <i class="ph ph-sign-in"></i> Anmelden
+      <i class="ph ph-sign-in"></i> <span data-i18n="loginBtn">Anmelden</span>
     </button>
 
     <div id="error-msg" style="display:none;">
@@ -247,11 +338,18 @@
     </div>
   </div>
 
+  <div class="lang-switcher">
+    <button class="lang-btn" data-lang="de" onclick="switchLoginLang('de')">DE</button>
+    <button class="lang-btn" data-lang="en" onclick="switchLoginLang('en')">EN</button>
+    <button class="lang-btn" data-lang="fr" onclick="switchLoginLang('fr')">FR</button>
+    <button class="lang-btn" data-lang="nl" onclick="switchLoginLang('nl')">NL</button>
+  </div>
+
   <button class="btn-incident" onclick="openIncModal()">
-    <i class="ph ph-siren"></i> Sicherheitsvorfall melden
+    <i class="ph ph-siren"></i> <span data-i18n="loginReportIncident">Sicherheitsvorfall melden</span>
   </button>
 
-  <div class="login-footer">
+  <div class="login-footer" data-i18n="loginFooter">
     ISMS Builder · ISO 27001 · BSI · NIS2 · EUCS · EU AI Act
   </div>
 
@@ -348,8 +446,36 @@
     </div>
   </div>
 
+  <script src="/ui/i18n/t.js"></script>
+  <script src="/ui/i18n/translations.js"></script>
   <script src="login-submit.js"></script>
   <script>
+    // ── i18n for login page ──────────────────────────────────────────────
+    function applyLoginLang() {
+      const lang = window.LANG || 'de'
+      document.documentElement.lang = lang
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.dataset.i18n)
+      })
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.dataset.i18nPlaceholder)
+      })
+      document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        el.title = t(el.dataset.i18nTitle)
+      })
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang)
+      })
+      document.title = t('loginTitle')
+    }
+
+    function switchLoginLang(lang) {
+      setLang(lang)
+      applyLoginLang()
+    }
+
+    document.addEventListener('DOMContentLoaded', applyLoginLang)
+
     async function openIncModal() {
       document.getElementById('incOverlay').classList.add('open')
       // Gesellschaften laden und Select befüllen (einmalig)
@@ -443,6 +569,76 @@
         }
       } catch {}
     })()
+
+    // ── Demo-Sprach-Overlay ──
+    function openDemoLangOverlay() {
+      document.getElementById('demoLangOverlay').classList.add('open')
+    }
+    function closeDemoLangOverlay() {
+      document.getElementById('demoLangOverlay').classList.remove('open')
+    }
+
+    async function loadDemoBundle(lang) {
+      const loadingEl = document.getElementById('demoLangLoading')
+      const grid = document.getElementById('demoLangGrid')
+      const skipBtn = document.getElementById('demoLangSkip')
+      grid.style.opacity = '0.4'
+      skipBtn.style.display = 'none'
+      loadingEl.style.display = 'block'
+      try {
+        const r = await fetch('/admin/demo-load-bundle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lang })
+        })
+        if (!r.ok) {
+          const d = await r.json()
+          loadingEl.textContent = 'Error: ' + (d.error || r.status)
+          loadingEl.style.color = '#e74c3c'
+          grid.style.opacity = '1'
+          skipBtn.style.display = ''
+          return
+        }
+        closeDemoLangOverlay()
+        window.location.href = '/ui/index.html'
+      } catch (e) {
+        loadingEl.textContent = 'Network error'
+        grid.style.opacity = '1'
+        skipBtn.style.display = ''
+      }
+    }
   </script>
+
+  <!-- ── Demo-Sprach-Overlay ── -->
+  <div class="demo-lang-overlay" id="demoLangOverlay">
+    <div class="demo-lang-card">
+      <h3>🌍 Welcome to ISMS Builder</h3>
+      <p>Choose your preferred language for the demo data.<br/>The user interface will follow the language you selected on the login page.</p>
+      <div class="demo-lang-grid" id="demoLangGrid">
+        <button class="demo-lang-btn" onclick="loadDemoBundle('de')">
+          <span class="flag">🇩🇪</span>
+          <span>Deutsch</span>
+          <small style="color:var(--subtle);font-size:11px;">Demo-Daten auf Deutsch</small>
+        </button>
+        <button class="demo-lang-btn" onclick="loadDemoBundle('en')">
+          <span class="flag">🇬🇧</span>
+          <span>English</span>
+          <small style="color:var(--subtle);font-size:11px;">Demo data in English</small>
+        </button>
+        <button class="demo-lang-btn" onclick="loadDemoBundle('fr')">
+          <span class="flag">🇫🇷</span>
+          <span>Français</span>
+          <small style="color:var(--subtle);font-size:11px;">Données de démonstration en français</small>
+        </button>
+        <button class="demo-lang-btn" onclick="loadDemoBundle('nl')">
+          <span class="flag">🇳🇱</span>
+          <span>Nederlands</span>
+          <small style="color:var(--subtle);font-size:11px;">Demogegevens in het Nederlands</small>
+        </button>
+      </div>
+      <div class="demo-lang-loading" id="demoLangLoading">Loading demo data…</div>
+      <button class="demo-lang-skip" id="demoLangSkip" onclick="loadDemoBundle('skip')">Skip – start with empty system</button>
+    </div>
+  </div>
 </body>
 </html>

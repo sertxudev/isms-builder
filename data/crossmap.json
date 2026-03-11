@@ -1,8 +1,8 @@
 [
   {
     "id": "CG-GOV-POLICY",
-    "topic": "IS-Richtlinien & Governance",
-    "description": "Übergreifende Sicherheitsrichtlinien, Strategie und Governance-Strukturen",
+    "topic": "IS Policies & Governance",
+    "description": "Overarching security policies, strategy and governance structures",
     "controls": [
       "ISO-5.1",
       "ISO-5.4",
@@ -16,8 +16,8 @@
   },
   {
     "id": "CG-RISK",
-    "topic": "Risikomanagement",
-    "description": "Risikoanalyse, -bewertung und -behandlung",
+    "topic": "Risk Management",
+    "description": "Risk analysis, assessment and treatment",
     "controls": [
       "ISO-5.1",
       "BSI-ISMS.2",
@@ -29,8 +29,8 @@
   },
   {
     "id": "CG-ROLES",
-    "topic": "Rollen & Verantwortlichkeiten",
-    "description": "Zuweisung von IS-Rollen, Aufgabentrennung und Verantwortlichkeiten",
+    "topic": "Roles & Responsibilities",
+    "description": "Assignment of IS roles, segregation of duties and responsibilities",
     "controls": [
       "ISO-5.2",
       "ISO-5.3",
@@ -42,8 +42,8 @@
   },
   {
     "id": "CG-ACCESS",
-    "topic": "Zugriffskontrolle & Identity Management",
-    "description": "Zugriffssteuerung, Identitätsverwaltung, Authentifizierung und Rechte",
+    "topic": "Access Control & Identity Management",
+    "description": "Access governance, identity management, authentication and permissions",
     "controls": [
       "ISO-5.15",
       "ISO-5.16",
@@ -59,8 +59,8 @@
   },
   {
     "id": "CG-INCIDENT",
-    "topic": "Vorfallmanagement & Incident Response",
-    "description": "Erkennung, Behandlung, Dokumentation und Lernen aus Sicherheitsvorfällen",
+    "topic": "Incident Management & Incident Response",
+    "description": "Detection, handling, documentation and lessons learned from security incidents",
     "controls": [
       "ISO-5.24",
       "ISO-5.25",
@@ -76,8 +76,8 @@
   },
   {
     "id": "CG-BCM",
-    "topic": "Business Continuity & Notfallvorsorge",
-    "description": "Betriebskontinuität, Backup, Notfallwiederherstellung und Krisenmanagement",
+    "topic": "Business Continuity & Emergency Preparedness",
+    "description": "Business continuity, backup, disaster recovery and crisis management",
     "controls": [
       "ISO-5.29",
       "ISO-5.30",
@@ -89,8 +89,8 @@
   },
   {
     "id": "CG-SUPPLY",
-    "topic": "Lieferkettensicherheit & Drittparteien",
-    "description": "Sicherheit in Lieferketten, Lieferantenverträgen und Cloud-Diensten",
+    "topic": "Supply Chain Security & Third Parties",
+    "description": "Security in supply chains, supplier contracts and cloud services",
     "controls": [
       "ISO-5.19",
       "ISO-5.20",
@@ -105,8 +105,8 @@
   },
   {
     "id": "CG-VULN",
-    "topic": "Schwachstellenmanagement & Patch",
-    "description": "Erkennung, Bewertung und Behebung von Schwachstellen und Software-Patches",
+    "topic": "Vulnerability Management & Patching",
+    "description": "Detection, assessment and remediation of vulnerabilities and software patches",
     "controls": [
       "ISO-8.8",
       "BSI-DER.3",
@@ -117,8 +117,8 @@
   },
   {
     "id": "CG-CRYPTO",
-    "topic": "Kryptografie & Schlüsselmanagement",
-    "description": "Einsatz von Kryptografie, Schlüsselmanagement und Verschlüsselung",
+    "topic": "Cryptography & Key Management",
+    "description": "Use of cryptography, key management and encryption",
     "controls": [
       "ISO-8.24",
       "ISO-8.25",
@@ -129,7 +129,7 @@
   {
     "id": "CG-LOG",
     "topic": "Logging & Monitoring",
-    "description": "Protokollierung von Ereignissen, Überwachung und Audit-Trails",
+    "description": "Event logging, monitoring and audit trails",
     "controls": [
       "ISO-8.15",
       "ISO-8.16",
@@ -141,8 +141,8 @@
   },
   {
     "id": "CG-PHYSICAL",
-    "topic": "Physische Sicherheit",
-    "description": "Perimeterschutz, Zutrittskontrolle und Schutz der physischen Infrastruktur",
+    "topic": "Physical Security",
+    "description": "Perimeter protection, access control and protection of physical infrastructure",
     "controls": [
       "ISO-7.1",
       "ISO-7.2",
@@ -155,8 +155,8 @@
   },
   {
     "id": "CG-TRAINING",
-    "topic": "Schulung & Sensibilisierung",
-    "description": "Sicherheitsbewusstsein, Schulungen und Cyber-Hygiene für Mitarbeiter",
+    "topic": "Training & Awareness",
+    "description": "Security awareness, training and cyber hygiene for employees",
     "controls": [
       "ISO-6.3",
       "BSI-ORP.3",
@@ -166,8 +166,8 @@
   },
   {
     "id": "CG-PRIVACY",
-    "topic": "Datenschutz & personenbezogene Daten",
-    "description": "Schutz personenbezogener Daten, Klassifizierung und Datenlöschung",
+    "topic": "Privacy & Personal Data",
+    "description": "Protection of personal data, classification and data deletion",
     "controls": [
       "ISO-5.34",
       "ISO-8.11",
@@ -178,8 +178,8 @@
   },
   {
     "id": "CG-CLASSIFY",
-    "topic": "Informationsklassifizierung & Asset-Management",
-    "description": "Inventarisierung, Klassifizierung und Kennzeichnung von Informationswerten",
+    "topic": "Information Classification & Asset Management",
+    "description": "Inventory, classification and labelling of information assets",
     "controls": [
       "ISO-5.9",
       "ISO-5.10",
@@ -191,8 +191,8 @@
   },
   {
     "id": "CG-CHANGE",
-    "topic": "Änderungsmanagement & Konfigurationskontrolle",
-    "description": "Change Management, Konfigurationsmanagement und sichere Entwicklung",
+    "topic": "Change Management & Configuration Control",
+    "description": "Change management, configuration management and secure development",
     "controls": [
       "ISO-8.32",
       "BSI-OPS.1",
@@ -203,8 +203,8 @@
   },
   {
     "id": "CG-COMPLY",
-    "topic": "Compliance & Auditvorbereitung",
-    "description": "Einhaltung gesetzlicher Anforderungen, interne Audits und unabhängige Prüfungen",
+    "topic": "Compliance & Audit Readiness",
+    "description": "Compliance with legal requirements, internal audits and independent reviews",
     "controls": [
       "ISO-5.31",
       "ISO-5.35",
@@ -216,8 +216,8 @@
   },
   {
     "id": "CG-HR",
-    "topic": "Personalsicherheit",
-    "description": "Hintergrundprüfungen, Einarbeitung, Vertragsbedingungen und Offboarding",
+    "topic": "Personnel Security",
+    "description": "Background checks, onboarding, employment terms and offboarding",
     "controls": [
       "ISO-6.1",
       "ISO-6.2",
@@ -231,8 +231,8 @@
   },
   {
     "id": "CG-AI-RISK",
-    "topic": "KI-Risikoklassifizierung & Governance",
-    "description": "Inventar, Risikoklassifizierung und Governance eingesetzter KI-Systeme",
+    "topic": "AI Risk Classification & Governance",
+    "description": "Inventory, risk classification and governance of deployed AI systems",
     "controls": [
       "EUAI-ART5",
       "EUAI-ART9",
@@ -243,8 +243,8 @@
   },
   {
     "id": "CG-AI-DOC",
-    "topic": "KI-Dokumentation & Transparenz",
-    "description": "Technische Dokumentation, Transparenzpflichten und Human Oversight für Hochrisiko-KI",
+    "topic": "AI Documentation & Transparency",
+    "description": "Technical documentation, transparency obligations and human oversight for high-risk AI",
     "controls": [
       "EUAI-ART11",
       "EUAI-ART13",
@@ -257,8 +257,8 @@
   },
   {
     "id": "CG-NETWORK",
-    "topic": "Netzwerksicherheit & Segmentierung",
-    "description": "Netzwerkschutz, Segmentierung, Firewalls und sichere Kommunikation",
+    "topic": "Network Security & Segmentation",
+    "description": "Network protection, segmentation, firewalls and secure communications",
     "controls": [
       "ISO-8.20",
       "ISO-8.21",

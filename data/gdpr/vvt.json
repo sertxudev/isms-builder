@@ -1,13 +1,22 @@
 [
   {
-    "id": "vvt_seed_001",
+    "id": "vvt_demo_de_001",
     "title": "Kundenverwaltung CRM",
     "purpose": "Verwaltung und Pflege von Kundendaten zur Vertragserfüllung und Kommunikation",
     "legalBasis": "contract",
-    "legalBasisNote": "Art. 6(1)(b) DSGVO – Vertragserfüllung",
-    "dataCategories": ["name", "email", "phone"],
-    "dataSubjectTypes": ["customers"],
-    "recipients": ["Interner Vertrieb", "Kundenservice"],
+    "legalBasisNote": "Art. 6 Abs. 1 lit. b DSGVO – Vertragserfüllung",
+    "dataCategories": [
+      "name",
+      "email",
+      "phone"
+    ],
+    "dataSubjectTypes": [
+      "customers"
+    ],
+    "recipients": [
+      "Interner Vertrieb",
+      "Kundenservice"
+    ],
     "internationalTransfer": false,
     "transferMechanism": "",
     "retentionPeriod": "3 Jahre nach Vertragsende",
@@ -16,7 +25,10 @@
     "isHighRisk": false,
     "automatedDecision": false,
     "linkedAv": [],
-    "linkedToms": ["tom_seed_001", "tom_seed_002"],
+    "linkedToms": [
+      "tom_demo_de_001",
+      "tom_demo_de_002"
+    ],
     "applicableEntities": [],
     "status": "approved",
     "owner": "admin",
@@ -25,28 +37,77 @@
     "createdBy": "admin"
   },
   {
-    "id": "vvt_seed_002",
+    "id": "vvt_demo_de_002",
     "title": "Personalverwaltung HR",
-    "purpose": "Verarbeitung von Mitarbeiterdaten zur Erfüllung arbeitsrechtlicher Pflichten und Gehaltsabrechnung",
+    "purpose": "Verarbeitung von Mitarbeiterdaten zur Erfüllung arbeitsrechtlicher Pflichten und Lohnbuchhaltung",
     "legalBasis": "legal_obligation",
-    "legalBasisNote": "Art. 6(1)(c) DSGVO – Rechtliche Verpflichtung (§§ 257 HGB, 147 AO)",
-    "dataCategories": ["name", "address", "financial"],
-    "dataSubjectTypes": ["employees"],
-    "recipients": ["HR-Abteilung", "Steuerberater", "Sozialversicherungsträger"],
+    "legalBasisNote": "Art. 6 Abs. 1 lit. c DSGVO – Rechtliche Verpflichtung (§§ 257 HGB, 147 AO)",
+    "dataCategories": [
+      "name",
+      "address",
+      "financial"
+    ],
+    "dataSubjectTypes": [
+      "employees"
+    ],
+    "recipients": [
+      "HR-Abteilung",
+      "Steuerberater",
+      "Sozialversicherungsträger"
+    ],
     "internationalTransfer": false,
     "transferMechanism": "",
     "retentionPeriod": "10 Jahre (§ 257 HGB, § 147 AO)",
     "retentionMonths": 120,
-    "deletionProcedure": "Physische und digitale Löschung nach Ablauf gesetzlicher Aufbewahrungsfristen",
+    "deletionProcedure": "Physische und digitale Löschung nach Ablauf der gesetzlichen Aufbewahrungsfristen",
     "isHighRisk": false,
     "automatedDecision": false,
     "linkedAv": [],
-    "linkedToms": ["tom_seed_001", "tom_seed_003", "tom_seed_004"],
+    "linkedToms": [
+      "tom_demo_de_001",
+      "tom_demo_de_003"
+    ],
     "applicableEntities": [],
     "status": "approved",
     "owner": "admin",
     "createdAt": "2025-01-15T10:00:00.000Z",
     "updatedAt": "2025-01-15T10:00:00.000Z",
+    "createdBy": "admin"
+  },
+  {
+    "id": "vvt_demo_de_003",
+    "title": "Website-Analyse und Marketing",
+    "purpose": "Analyse der Website-Nutzung zur Verbesserung der Benutzererfahrung und gezieltes Marketing",
+    "legalBasis": "consent",
+    "legalBasisNote": "Art. 6 Abs. 1 lit. a DSGVO – Einwilligung",
+    "dataCategories": [
+      "ip_address",
+      "browser_data",
+      "usage_data"
+    ],
+    "dataSubjectTypes": [
+      "website_visitors"
+    ],
+    "recipients": [
+      "IT-Abteilung",
+      "Marketing"
+    ],
+    "internationalTransfer": true,
+    "transferMechanism": "scc",
+    "retentionPeriod": "26 Monate",
+    "retentionMonths": 26,
+    "deletionProcedure": "Automatische Löschung über Einstellungen der Analyseplattform",
+    "isHighRisk": false,
+    "automatedDecision": false,
+    "linkedAv": [],
+    "linkedToms": [
+      "tom_demo_de_002"
+    ],
+    "applicableEntities": [],
+    "status": "review",
+    "owner": "admin",
+    "createdAt": "2025-03-01T10:00:00.000Z",
+    "updatedAt": "2025-03-01T10:00:00.000Z",
     "createdBy": "admin"
   }
 ]

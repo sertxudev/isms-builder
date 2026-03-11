@@ -1,4 +1,4 @@
-// © 2026 Claude Hecker — ISMS Builder V 1.28 — AGPL-3.0
+// © 2026 Claude Hecker — ISMS Builder V 1.29 — AGPL-3.0
 // Append-only audit log store.
 // Entries are stored in data/audit-log.json, capped at MAX_ENTRIES (rolling).
 
