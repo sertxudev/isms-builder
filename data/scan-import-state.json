@@ -1,0 +1,23 @@
+{
+  "lastImport": "2026-03-12T16:59:02.055Z",
+  "lastScanRef": "testing",
+  "lastMethod": "xml",
+  "lastImportedBy": "admin",
+  "totalImported": 30,
+  "history": [
+    {
+      "date": "2026-03-12T16:59:02.055Z",
+      "scanRef": "testing",
+      "method": "xml",
+      "created": 11,
+      "skipped": 0
+    },
+    {
+      "date": "2026-03-12T15:51:36.470Z",
+      "scanRef": "Scan_26/03_alpha_pdf",
+      "method": "pdf",
+      "created": 19,
+      "skipped": 0
+    }
+  ]
+}

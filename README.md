@@ -240,10 +240,18 @@ Contributions are very welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 | ✅ Done | FR/NL Guidance translations + admin language configuration (V 1.32.0) |
 | ✅ Done | MariaDB/MySQL backend (`STORAGE_BACKEND=mariadb`, V 1.34.1) |
 | ✅ Done | Scanner → Risk draft (Greenbone/OpenVAS XML + PDF import, V 1.33.0) |
+| ✅ Done | Policy Acknowledgement — staff confirm policies digitally with audit trail (V 1.35.0) |
+| ✅ Done | Guidance CRUD — create, edit and upload own documentation (V 1.35.0) |
+| ✅ Done | Guidance Search — cross-category full-text search with excerpt (V 1.35.0) |
+| 🔜 Next | AI Policy Assistant — Ollama drafts policy content from title + framework |
+| 🔜 Next | Scheduled Reports — weekly/monthly compliance report delivered by email |
 | 🔜 Next | PostgreSQL backend |
 | 🔜 Next | Audit-log anomaly detection (LLM batch) |
+| 🚀 Later | Quantitative risk scoring (€-values, FAIR-inspired) |
+| 🚀 Later | Auditor collaboration portal — external read-only access for auditors |
 | 🚀 Later | ownCloud / Nextcloud integration |
 | 🚀 Later | Policy gap analysis (LLM) |
+| 🏁 V 2.x | Configurable Guidance categories — admins define custom categories (e.g. workflows, org documents) |
 
 ---
 

@@ -7278,6 +7278,7 @@ const GUIDANCE_CATS = [
 let _guidanceDocs  = []
 let _guidanceCat   = 'systemhandbuch'
 let _guidanceDocId = null
+let _guidanceSearchTimer = null
 
 async function renderGuidance() {
   removeGuidance()
@@ -7295,6 +7296,13 @@ async function renderGuidance() {
     <div class="guidance-header">
       <h2><i class="ph ph-compass"></i> Guidance & Dokumentation</h2>
       <div class="guidance-header-actions" id="guidanceHeaderActions">
+        <div class="guidance-search-wrap">
+          <i class="ph ph-magnifying-glass guidance-search-icon"></i>
+          <input id="guidanceSearchInput" class="guidance-search-input" type="search"
+            placeholder="Dokumente durchsuchen…"
+            oninput="onGuidanceSearchInput(this.value)"
+            onkeydown="if(event.key==='Escape'){this.value='';onGuidanceSearchInput('')}" />
+        </div>
         ${canEdit ? `
           <button class="btn btn-secondary btn-sm" onclick="openGuidanceEditor()">
             <i class="ph ph-plus"></i> Neu
@@ -7486,10 +7494,60 @@ function _printGuidanceDocs(docs) {
 function switchGuidanceCat(cat) {
   _guidanceCat = cat
   _guidanceDocId = null
+  // Clear search when switching category
+  const inp = dom('guidanceSearchInput')
+  if (inp) inp.value = ''
   document.querySelectorAll('.guidance-cat-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.cat === cat)
   })
   loadGuidanceDocs()
+}
+
+function onGuidanceSearchInput(val) {
+  clearTimeout(_guidanceSearchTimer)
+  if (!val.trim()) {
+    // Back to normal category view
+    renderGuidanceList()
+    renderGuidanceEmpty()
+    return
+  }
+  _guidanceSearchTimer = setTimeout(() => runGuidanceSearch(val.trim()), 300)
+}
+
+async function runGuidanceSearch(query) {
+  const res = await fetch(`/guidance?search=${encodeURIComponent(query)}`, { headers: apiHeaders() })
+  const results = res.ok ? await res.json() : []
+  renderGuidanceSearchResults(results, query)
+}
+
+function renderGuidanceSearchResults(results, query) {
+  // Update list column
+  const ul = dom('guidanceDocList')
+  if (!ul) return
+  if (results.length === 0) {
+    ul.innerHTML = `<li style="padding:12px;color:var(--text-subtle);font-size:13px;">Keine Treffer für „${escHtml(query)}"</li>`
+    renderGuidanceEmpty()
+    return
+  }
+  ul.innerHTML = results.map(d => {
+    const icon = d.type === 'pdf' ? 'ph-file-pdf' : d.type === 'docx' ? 'ph-file-doc' : 'ph-file-text'
+    const catMeta = GUIDANCE_CATS.find(c => c.id === d.category)
+    const catLabel = catMeta ? catMeta.label : d.category
+    return `
+      <li class="guidance-doc-item ${d.id === _guidanceDocId ? 'active' : ''}" data-id="${d.id}"
+        onclick="renderGuidanceDoc(${JSON.stringify(d).replace(/"/g,'&quot;')})">
+        <i class="ph ${icon} guidance-doc-icon"></i>
+        <div style="min-width:0">
+          <span class="guidance-doc-title">${escHtml(d.title)}</span>
+          <span style="display:block;font-size:11px;color:var(--text-subtle);margin-top:2px;">${escHtml(catLabel)}</span>
+          ${d.excerpt ? `<span style="display:block;font-size:11px;color:var(--text-subtle);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(d.excerpt)}</span>` : ''}
+        </div>
+      </li>
+    `
+  }).join('')
+
+  // Auto-open first result in viewer
+  renderGuidanceDoc(results[0])
 }
 
 async function deleteGuidanceDoc(id) {
@@ -7500,7 +7558,7 @@ async function deleteGuidanceDoc(id) {
   await loadGuidanceDocs()
 }
 
-// ── Editor Modal ──
+// ── Editor Inline Form ──
 
 function openGuidanceEditor(docArg) {
   // If called from inline HTML with single-quoted JSON string
@@ -7517,17 +7575,22 @@ function openGuidanceEditor(docArg) {
     .map(c => `<option value="${c.id}" ${doc?.category === c.id ? 'selected' : ''}>${c.label}</option>`)
     .join('')
 
-  const modalHtml = `
-    <div id="guidanceEditorModal" class="modal" style="visibility:visible;">
-      <div class="modal-content modal-lg">
-        <div class="modal-header">
-          <h3 class="modal-title">
-            <i class="ph ph-pencil"></i> ${isEdit ? 'Edit Document' : 'New Document'}
-          </h3>
-          <button class="modal-close" onclick="closeGuidanceEditor()"><i class="ph ph-x"></i></button>
-        </div>
-        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+  const col = dom('guidanceViewerCol')
+  if (!col) return
+
+  col.innerHTML = `
+    <div class="training-form-page">
+      <div class="training-form-header">
+        <button class="btn btn-secondary btn-sm" onclick="closeGuidanceEditor()">
+          <i class="ph ph-arrow-left"></i> Back
+        </button>
+        <h3 class="training-form-title">
+          <i class="ph ph-pencil"></i> ${isEdit ? 'Edit Document' : 'New Document'}
+        </h3>
+      </div>
+      <div class="training-form-body">
+        <div class="training-form-section">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
               <label class="form-label">Title</label>
               <input id="gEditTitle" class="form-input" value="${escHtml(doc?.title || '')}" placeholder="Document title…" />
@@ -7538,9 +7601,9 @@ function openGuidanceEditor(docArg) {
             </div>
           </div>
           ${!isEdit ? `
-            <div>
+            <div style="margin-bottom:12px;">
               <label class="form-label">Type</label>
-              <select id="gEditType" class="select" onchange="toggleGuidanceEditorType()">
+              <select id="gEditType" class="select">
                 <option value="markdown">Markdown</option>
                 <option value="html">HTML</option>
               </select>
@@ -7551,13 +7614,15 @@ function openGuidanceEditor(docArg) {
               <button class="guidance-editor-tab active" onclick="switchGuidanceEditorTab('edit', this)">Edit</button>
               <button class="guidance-editor-tab" onclick="switchGuidanceEditorTab('preview', this)">Preview</button>
             </div>
-            <textarea id="gEditContent" class="form-textarea" rows="14"
+            <textarea id="gEditContent" class="form-textarea" rows="16"
               oninput="refreshGuidancePreview()">${escHtml(doc?.content || '')}</textarea>
             <div id="gEditPreview" class="guidance-editor-preview guidance-md" style="display:none;"></div>
           </div>
-          ${renderLinksBlock('ge', doc?.linkedControls||[], [], false)}
+          <div style="margin-top:12px;">
+            ${renderLinksBlock('ge', doc?.linkedControls||[], [], false)}
+          </div>
         </div>
-        <div class="modal-footer">
+        <div style="display:flex;gap:8px;justify-content:flex-end;padding:12px 0;">
           <button class="btn btn-secondary" onclick="closeGuidanceEditor()">Cancel</button>
           <button class="btn btn-primary" onclick="saveGuidanceEditor('${isEdit ? doc.id : ''}')">
             <i class="ph ph-floppy-disk"></i> Save
@@ -7566,11 +7631,17 @@ function openGuidanceEditor(docArg) {
       </div>
     </div>
   `
-  document.body.insertAdjacentHTML('beforeend', modalHtml)
   initLinkPickers('ge', false)
 }
 
-function closeGuidanceEditor() { dom('guidanceEditorModal')?.remove() }
+function closeGuidanceEditor() {
+  // Return to doc view or empty state
+  if (_guidanceDocId) {
+    const doc = _guidanceDocs.find(d => d.id === _guidanceDocId)
+    if (doc) { renderGuidanceDoc(doc); return }
+  }
+  renderGuidanceEmpty()
+}
 
 function switchGuidanceEditorTab(tab, btn) {
   document.querySelectorAll('.guidance-editor-tab').forEach(b => b.classList.remove('active'))
@@ -7623,7 +7694,7 @@ async function saveGuidanceEditor(existingId) {
   }
 }
 
-// ── Upload Modal ──
+// ── Upload Inline Form ──
 
 function openGuidanceUpload() {
   const cats = GUIDANCE_CATS
@@ -7631,21 +7702,30 @@ function openGuidanceUpload() {
     .map(c => `<option value="${c.id}">${c.label}</option>`)
     .join('')
 
-  const modalHtml = `
-    <div id="guidanceUploadModal" class="modal" style="visibility:visible;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title"><i class="ph ph-upload-simple"></i> Upload File</h3>
-          <button class="modal-close" onclick="closeGuidanceUpload()"><i class="ph ph-x"></i></button>
-        </div>
-        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
-          <div>
-            <label class="form-label">Title</label>
-            <input id="gUploadTitle" class="form-input" placeholder="Document title…" />
-          </div>
-          <div>
-            <label class="form-label">Category</label>
-            <select id="gUploadCat" class="select">${cats}</select>
+  const col = dom('guidanceViewerCol')
+  if (!col) return
+
+  col.innerHTML = `
+    <div class="training-form-page">
+      <div class="training-form-header">
+        <button class="btn btn-secondary btn-sm" onclick="closeGuidanceUpload()">
+          <i class="ph ph-arrow-left"></i> Back
+        </button>
+        <h3 class="training-form-title">
+          <i class="ph ph-upload-simple"></i> Upload File
+        </h3>
+      </div>
+      <div class="training-form-body">
+        <div class="training-form-section">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <label class="form-label">Title</label>
+              <input id="gUploadTitle" class="form-input" placeholder="Document title…" />
+            </div>
+            <div>
+              <label class="form-label">Category</label>
+              <select id="gUploadCat" class="select">${cats}</select>
+            </div>
           </div>
           <div>
             <label class="form-label">File (PDF, DOCX, DOC · max. 20 MB)</label>
@@ -7657,7 +7737,7 @@ function openGuidanceUpload() {
               onchange="updateGuidanceUploadLabel(this)" />
           </div>
         </div>
-        <div class="modal-footer">
+        <div style="display:flex;gap:8px;justify-content:flex-end;padding:12px 0;">
           <button class="btn btn-secondary" onclick="closeGuidanceUpload()">Cancel</button>
           <button class="btn btn-primary" onclick="submitGuidanceUpload()">
             <i class="ph ph-upload-simple"></i> Upload
@@ -7666,10 +7746,15 @@ function openGuidanceUpload() {
       </div>
     </div>
   `
-  document.body.insertAdjacentHTML('beforeend', modalHtml)
 }
 
-function closeGuidanceUpload() { dom('guidanceUploadModal')?.remove() }
+function closeGuidanceUpload() {
+  if (_guidanceDocId) {
+    const doc = _guidanceDocs.find(d => d.id === _guidanceDocId)
+    if (doc) { renderGuidanceDoc(doc); return }
+  }
+  renderGuidanceEmpty()
+}
 
 function updateGuidanceUploadLabel(input) {
   const label = dom('gUploadFileLabel')

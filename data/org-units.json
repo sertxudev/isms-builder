@@ -1,0 +1,46 @@
+[
+  {
+    "id": "ou-cio",
+    "name": "CIO",
+    "type": "cio",
+    "parentId": null,
+    "head": "",
+    "email": "",
+    "description": "Chief Information Officer — strategic IT governance and oversight",
+    "createdAt": "2026-03-12T00:00:00.000Z",
+    "updatedAt": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "ou-groupit",
+    "name": "GroupIT",
+    "type": "group",
+    "parentId": "ou-cio",
+    "head": "",
+    "email": "",
+    "description": "IT Stabsstelle — central infrastructure operations. Provides service to subsidiaries without local IT.",
+    "createdAt": "2026-03-12T00:00:00.000Z",
+    "updatedAt": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "ou-groupapp",
+    "name": "GroupApp",
+    "type": "group",
+    "parentId": "ou-cio",
+    "head": "",
+    "email": "",
+    "description": "Applications Programming & Deployment — SAP, Navision, ERP systems and custom applications",
+    "createdAt": "2026-03-12T00:00:00.000Z",
+    "updatedAt": "2026-03-12T00:00:00.000Z"
+  },
+  {
+    "id": "ou-localit",
+    "name": "Local IT",
+    "type": "local",
+    "parentId": "ou-groupit",
+    "head": "",
+    "email": "",
+    "description": "Local IT teams at subsidiary level. If no local IT exists, service is provided by GroupIT.",
+    "createdAt": "2026-03-12T00:00:00.000Z",
+    "updatedAt": "2026-03-12T00:00:00.000Z"
+  }
+]

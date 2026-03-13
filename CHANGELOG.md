@@ -8,6 +8,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.35.0] — 2026-03-13
+
+### Added
+- **Policy Acknowledgement — Richtlinien-Bestätigungssystem**: Mitarbeiter können Richtlinien digital bestätigen, ohne einen ISMS-Account zu benötigen. Drei Betriebsmodi (org-weit durch Admin konfigurierbar):
+  - `email_campaign` — Token-Links per E-Mail, öffentliche Bestätigungsseite `/ack/:token` ohne Login
+  - `manual` — manuelle Einzel- oder CSV-Massenerfassung durch contentowner
+  - `distribution_only` — reine Dokumentenverteilung ohne Bestätigungserfassung
+  - Verteilrunden (Distributions) mit templateId, Zielgruppe, Fälligkeitsdatum, Status-Tracking
+  - Fortschrittsstatistiken (confirmed / pending / total) pro Verteilrunde
+  - CSV-Export (BOM-kodiert für Excel-Kompatibilität) aller Bestätigungen
+  - Dashboard-KPI-Karte mit activeDistributions + pendingAcks
+  - RBAC: contentowner anlegen/ansehen, admin löschen/Bestätigungen entfernen; reader Summary abrufen
+  - Neue Dateien: `server/db/ackStore.js`, `server/routes/acknowledgements.js`, `server/routes/ackPublic.js`, `data/policy-distributions.json`, `data/policy-acks.json`
+  - 28 neue Tests in `tests/acknowledgements.test.js`
+- **Guidance Suche — Kategorieübergreifend**: Suchfeld im Guidance-Header durchsucht Titel und Inhalt aller Dokumente über alle Kategorien; Ergebnisliste mit Kategorie-Label und Inhaltsexcerpt; Debounce 300 ms; Escape leert das Feld; Kategorie-Wechsel setzt Suche zurück; server-seitig via `GET /guidance?search=`; `guidanceStore.search()` neu
+- **Guidance CRUD — Eigene Dokumente erstellen**: contentowner+ können eigene Guidance-Dokumente (Markdown/HTML) anlegen, bearbeiten und Dateien (PDF/DOCX/DOC bis 20 MB) hochladen; Admin kann löschen (Soft-Delete + permanentes Delete)
+  - **Neu-Button** und **Upload-Button** in Guidance-Header für contentowner+
+  - **Edit-Button** beim Anzeigen eines Dokuments
+  - Alle Formulare als Ganzseitige Inline-Forms (training-form-page Pattern, keine Modals)
+  - Edit/Preview-Tabs im Markdown-Editor (live-Rendering via marked.js)
+  - `linkedControls`-Picker zur Verknüpfung mit SoA-Controls
+  - Abgrenzung user-erstellter Dokumente vs. Seed-Dokumente (`seedId`-Feld)
+  - Dokumentation: Abschnitt 52 in `docs/ISMS-build-documentation.md`
+
+---
+
 ## [1.34.1] — 2026-03-13
 
 ### Added

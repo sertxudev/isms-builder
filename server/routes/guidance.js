@@ -40,9 +40,10 @@ function _syncSeedLang(lang) {
 }
 
 router.get('/guidance', requireAuth, authorize('reader'), (req, res) => {
-  const { category, lang } = req.query
+  const { category, lang, search } = req.query
   if (lang && SUPPORTED_LANGS.includes(lang)) _syncSeedLang(lang)
   const rank = req.roleRank || 1
+  if (search) return res.json(guidanceStore.search(search, rank))
   if (category) return res.json(guidanceStore.getByCategory(category, rank))
   res.json(guidanceStore.getAll(rank))
 })

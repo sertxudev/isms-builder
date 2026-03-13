@@ -181,6 +181,12 @@ STORAGE_BACKEND=sqlite                    # sqlite | json | mariadb | postgres
 # SMTP_USER=isms@example.com
 # SMTP_PASS=password
 # SMTP_FROM=ISMS Builder <isms@example.com>
+
+# Ollama / KI (optional – für semantische Suche und Scanner-PDF-Import)
+# OLLAMA_HOST=localhost          # Ollama-Server-Host (Standard: localhost)
+# OLLAMA_PORT=11434              # Ollama-Port (Standard: 11434)
+# OLLAMA_MODEL=llama3.2:3b      # Modell für Scanner-PDF-Import (Standard: llama3.2:3b)
+# (Embedding-Modell nomic-embed-text wird über Admin → Organisation → KI-Integration konfiguriert)
 ```
 
 **Wichtig:** `SSL_CERT_FILE` / `SSL_KEY_FILE` nur eintragen wenn HTTPS gewünscht ist. Sind diese Variablen gesetzt, startet der Server als HTTPS – Browser-URL muss dann `https://` verwenden.
@@ -525,13 +531,52 @@ GET /reports/export/csv     – CSV-Export ?type=...&entity=...&framework=...
 
 **Endpunkte:**
 ```
-GET  /soa/frameworks      – Frameworks (ID, Label, Farbe)
-GET  /soa                 – alle Controls (?framework=, ?theme=)
-GET  /soa/summary         – Umsetzungsrate pro Framework
-PUT  /soa/:id             – Control aktualisieren (editor+)
-GET  /soa/export          – JSON-Export
-GET  /soa/crossmap        – Cross-Mapping-Gruppen
+GET  /soa/frameworks                  – Frameworks (ID, Label, Farbe)
+GET  /soa                             – alle Controls (?framework=, ?theme=)
+GET  /soa/summary                     – Umsetzungsrate pro Framework
+PUT  /soa/:id                         – Standard-Control aktualisieren (editor+)
+GET  /soa/export                      – JSON-Export
+GET  /soa/crossmap                    – Cross-Mapping-Gruppen
+
+POST /soa/custom                      – Custom Control anlegen (contentowner+)
+PUT  /soa/custom/:id                  – Custom Control bearbeiten (contentowner+)
+DELETE /soa/custom/:id                – Custom Control löschen (contentowner+)
+
+GET  /soa/import-controls/status      – ISO-Import-Status prüfen (admin)
+POST /soa/import-controls             – ISO-Controls importieren (admin) → { controls: [...] }
+GET  /admin/soa-frameworks            – Framework-Aktivierung lesen
+PUT  /admin/soa-frameworks            – Framework-Aktivierung setzen
 ```
+
+### Custom Controls
+
+Organisationen können eigene Controls anlegen — z.B. interne Vorgaben, branchenspezifische Anforderungen oder Sonderanforderungen die keinem der acht Standard-Frameworks zugeordnet sind.
+
+| Feld | Beschreibung |
+|---|---|
+| `id` | Automatisch generiert, Präfix `CUSTOM-` |
+| `framework` | Immer `CUSTOM` |
+| `title` | Freitext-Titel des Controls |
+| `theme` | Themengruppe (frei wählbar) |
+| `applicable` | true / false |
+| `status` | not_applicable / planned / partial / implemented |
+| `owner` | Verantwortlicher |
+| `justification` | Begründung |
+| `linkedTemplates` | Verknüpfte Richtlinien |
+
+**RBAC:** Anlegen, bearbeiten und löschen erfordert mindestens `contentowner` (Rang 3).
+
+**Lösch-Schutz:** Ein Custom Control kann nur gelöscht werden wenn keine Templates damit verknüpft sind. Andernfalls gibt die API `409 Conflict` mit dem Hinweis welche Templates betroffen sind.
+
+**ISO-Controls-Import (API):**
+
+Neben dem Bash-Script `scripts/import-iso-controls.sh` gibt es eine API-Route für den Import:
+```
+POST /soa/import-controls
+Content-Type: application/json
+{ "controls": [ { "id": "ISO-5.1", "framework": "ISO27001", "title": "...", ... } ] }
+```
+Status prüfen (wieviele Controls pro Framework vorhanden): `GET /soa/import-controls/status`
 
 ### Modulübergreifende Traceability (Control- & Policy-Verknüpfungen)
 
@@ -569,18 +614,78 @@ Jeder Eintrag in allen Modulen kann mit SoA-Controls und Richtlinien (Templates)
 
 ## 13. Admin-Panel (minRole: admin)
 
-7 Tabs:
+8 Tabs:
 
 | Tab | Inhalt |
 |---|---|
-| **Benutzer** | Anlegen, bearbeiten, löschen; Rollen-Badges |
+| **Benutzer** | Anlegen, bearbeiten, löschen; Rollen-Badges; Funktions-Checkboxen (ciso, dso, qmb, bcm_manager, dept_head, auditor, admin_notify) |
 | **Gesellschaften** | Konzernstruktur (Holding + Töchter), Baum-CRUD |
 | **Vorhandene Templates** | Alle Templates mit Löschen-Funktion |
-| **Listen** | 6 editierbare Dropdown-Listen (Template-Typen, Risikokategorien, Risikobehandlung, GDPR Datenkats, GDPR Betroffene, Vorfallsarten) |
-| **Organisation** | Name, ISMS-Scope, CISO/DSB/ICS-Kontakt |
+| **Listen** | 6 editierbare Dropdown-Listen: Template-Typen, Risikokategorien, Risikobehandlungen, GDPR-Datenkategorien, GDPR-Betroffenentypen, Vorfallsarten |
+| **Organisation** | Org-Name, ISMS-Scope, CISO/DSB-Kontakt; Sicherheitsrichtlinien (2FA-Pflicht); SMTP-Konfiguration + Test-Mail; Navigationsreihenfolge (Drag & Drop); **Richtlinien-Bestätigung** (policyAckMode); E-Mail-Benachrichtigungen |
 | **Audit-Log** | Filterbar nach User/Aktion/Ressource/Datum, Pagination, löschbar |
-| **Wartung** | Vollexport (JSON), Cleanup verwaister Anhänge, **Demo-Reset**, **Demo-Import** |
-| **System-Konfiguration** | Modul-Verwaltung: jedes Modul einzeln aktivieren/deaktivieren — systemweit für alle Benutzer. Darunter: **SoA Framework-Selektion** — jedes der 8 Frameworks (ISO 27001, BSI, NIS2, EUCS, EUAI, ISO 9000, ISO 9001, CRA) einzeln aktivieren/deaktivieren. Deaktivierte Frameworks erscheinen nicht in SoA-Tabs, Dashboard-Compliance und Reports. Mindestens 1 Framework muss aktiv bleiben. |
+| **Wartung** | Vollexport (JSON), Cleanup verwaister Anhänge, **Demo-Reset**, **Demo-Import**, **Scanner-Import-Status** |
+| **System-Konfiguration** | 13 Modul-Toggles (soa, guidance, goals, risk, legal, incident, gdpr, training, reports, calendar, assets, governance, bcm, suppliers) + 8 SoA Framework-Toggles. Mindestens 1 Framework muss aktiv bleiben. **KI-Integration** (Ollama-URL, Embedding-Modell). |
+
+### Organisation-Tab (Details)
+
+Der Organisation-Tab enthält folgende Sektionen:
+
+| Sektion | Felder / Funktion |
+|---|---|
+| **Organisationsdaten** | Org-Name, Kürzel, ISMS-Scope, Logo-Text |
+| **Verantwortlichkeiten** | CISO-Name/E-Mail, GDPO-Name/E-Mail, ICS-Kontakt |
+| **Sicherheitsrichtlinien** | 2FA systemweit erzwingen (blockiert Login ohne TOTP) |
+| **KI-Integration** | Ollama-URL (leer = localhost:11434), Embedding-Modell (leer = nomic-embed-text), globaler KI-Toggle |
+| **SMTP-Konfiguration** | Host, Port, TLS, User, Passwort, Absenderadresse; Test-Mail-Button; Hinweis wenn .env-Variablen Vorrang haben |
+| **Splash-Screen** | Aktivieren/deaktivieren, Anzeigedauer (1–30 Sek.) |
+| **Sprach-Konfiguration** | Aktivierte Sprachen (DE/EN/FR/NL), Standard-Sprache für Login-Seite |
+| **Navigationsreihenfolge** | Drag & Drop oder ↑↓-Buttons; Reset auf Standard |
+| **Richtlinien-Bestätigung** | `policyAckMode`: email_campaign / manual / distribution_only (nur admin) |
+| **E-Mail-Benachrichtigungen** | Globaler Toggle; Einzelne Typen: Risiken (→ CISO), DSAR/GDPR-Vorfälle (→ GDPO), Verträge/Templates/Lieferanten-Audits (→ Admin), BCM-Tests, Löschprotokoll |
+
+### API-Endpunkte (Admin)
+
+```
+GET  /admin/users              – Benutzerliste
+POST /admin/users              – Benutzer anlegen
+PUT  /admin/users/:id          – Benutzer bearbeiten
+DELETE /admin/users/:id        – Benutzer löschen
+
+GET  /admin/lists              – alle editierbaren Listen
+PUT  /admin/list/:listId       – Liste speichern
+POST /admin/list/:listId/reset – Liste auf Standard zurücksetzen
+
+GET  /admin/org-settings       – Organisations-Einstellungen lesen
+PUT  /admin/org-settings       – Organisations-Einstellungen speichern
+
+GET  /admin/security           – 2FA-Enforcement-Status
+PUT  /admin/security           – 2FA-Enforcement setzen
+
+GET  /admin/modules            – Modul-Konfiguration
+PUT  /admin/modules            – Modul-Konfiguration speichern
+GET  /admin/soa-frameworks     – Framework-Aktivierung
+PUT  /admin/soa-frameworks     – Framework-Aktivierung setzen
+
+GET  /admin/ack-settings       – Policy-Bestätigungs-Modus lesen
+PUT  /admin/ack-settings       – Policy-Bestätigungs-Modus setzen (admin)
+
+GET  /admin/audit-log          – Audit-Log (paginiert, filterbar)
+DELETE /admin/audit-log        – Audit-Log-Einträge löschen
+
+GET  /admin/export             – Vollexport aller Daten als JSON
+POST /admin/maintenance/cleanup – verwaiste Anhänge löschen
+
+GET  /admin/scan-import/status – Scanner-Import-Verlauf
+POST /admin/scan-import/upload – Greenbone XML/PDF hochladen (auditor+)
+
+POST /admin/email/test         – Test-Mail senden
+GET  /admin/email/status       – SMTP-Konfigurations-Status
+
+POST /admin/demo-reset         – Demo-Daten zurücksetzen (Prompt: "RESET")
+POST /admin/demo-import        – Demo-Bundle wiederherstellen
+GET  /auth/demo-reset-done     – Prüfen ob Reset-Flag aktiv (öffentlich)
+```
 
 ---
 
@@ -1632,12 +1737,16 @@ Die Präsentation ist eine selbst-enthaltene HTML-Datei — kein Internet, kein 
 
 ## 36. Geplante Erweiterungen & offene TODOs
 
-### Geplante Features
+### Geplante Features (V 1.x)
 
 - **PostgreSQL-Backend** (`pgStore.js` vervollständigen) — für Multi-Instanz / Hochverfügbarkeit
 - **EN-Spiegelstruktur** — Mehrsprachigkeit (DE/EN) für Templates und UI
 - **CSV-Export Legal-Modul** — Verträge, NDAs und Datenschutzrichtlinien als CSV-Export
 - **Datei-Upload für Verträge** — PDF/DOCX-Anhänge direkt im Legal-Modul
+
+### Roadmap V 2.x
+
+- **Guidance-Kategorien konfigurierbar** — Admins können eigene Kategorien definieren (z.B. „Organisationsdokumente", „Arbeitsabläufe", „Checklisten"); `GUIDANCE_CATS` wird aus der API geladen statt hartcodiert; Standard-Kategorien bleiben als nicht-löschbare Basis erhalten; optional: `minRole` pro Kategorie konfigurierbar; Persistenz in `data/custom-lists.json` oder eigenem `data/guidance-categories.json`
 
 ### Geplante KI-Integration (Ollama · lokal · DSGVO-konform)
 
@@ -2548,3 +2657,388 @@ Das Register wird von CI und `security-check.sh` automatisch ausgewertet. Beim �
 | `.github/workflows/ci.yml` | CI-Pipeline inkl. Audit-Schritt und Pin-Verifikation |
 | `scripts/security-check.sh` | Lokaler Security- und Patch-Status-Check |
 | `package.json` | `"pdf-parse": "1.1.1"` — exaktes Pin ohne `^` |
+
+---
+
+## 50. Policy Acknowledgement — Richtlinien-Bestätigungssystem (V 1.35.0)
+
+### Hintergrund
+
+Ein ISMS-Tool richtet sich an das ISMS-Team (CISO, DSO, Auditoren, Contentowner) — typischerweise 5–20 Personen. Die gesamte Belegschaft bekommt keinen ISMS-Zugang. Policy Acknowledgement löst dieses Problem: Mitarbeiter können Richtlinien bestätigen, **ohne einen Account im ISMS Builder zu besitzen**.
+
+---
+
+### Konzept: Org-weiter Modus
+
+Der Bestätigungs-Modus wird **einmalig vom Admin** unter Admin → Organisation eingestellt und gilt für alle zukünftigen Verteilrunden. Ein Wechsel ist jederzeit möglich, bestehende Kampagnen behalten ihren ursprünglichen Modus.
+
+| Modus | Beschreibung | Geeignet für |
+|-------|--------------|--------------|
+| `email_campaign` | Token-Link per E-Mail, kein Login nötig | Organisationen mit SMTP-Server |
+| `manual` | Bestätigungen manuell eintragen oder per CSV importieren | Ohne SMTP oder externe Bestätigungskanäle |
+| `distribution_only` | Nur Verteilungsdatum + Zielgruppe dokumentieren | Minimaler Nachweis für Audits |
+
+---
+
+### Datenmodell
+
+**`data/policy-distributions.json`** — eine Verteilrunde pro Eintrag:
+
+```json
+{
+  "id": "m6bj7k-abc123",
+  "templateId": "template-id",
+  "templateTitle": "IT-Sicherheitsrichtlinie",
+  "templateType": "policy",
+  "templateVersion": 3,
+  "mode": "email_campaign",
+  "targetGroup": "Alle Mitarbeiter",
+  "dueDate": "2026-04-30T00:00:00.000Z",
+  "emailList": ["alice@firma.de", "bob@firma.de"],
+  "notes": "",
+  "status": "active",
+  "createdAt": "2026-03-13T15:00:00.000Z",
+  "createdBy": "admin@example.com",
+  "emailSentAt": "2026-03-13T15:01:00.000Z",
+  "emailSentCount": 2
+}
+```
+
+**`data/policy-acks.json`** — individuelle Bestätigungen:
+
+```json
+{
+  "id": "ack-xyz",
+  "distributionId": "m6bj7k-abc123",
+  "recipientEmail": "alice@firma.de",
+  "recipientName": "Alice Müller",
+  "token": "unique-token-for-email-link",
+  "acknowledgedAt": "2026-03-14T09:00:00.000Z",
+  "ipAddress": "192.168.1.1",
+  "method": "email_link"
+}
+```
+
+`method` kann sein: `email_link` | `manual` | `csv_import`
+
+---
+
+### API-Routen
+
+| Methode | Pfad | Rolle | Beschreibung |
+|---------|------|-------|--------------|
+| `GET` | `/admin/ack-settings` | admin | Aktuellen Modus lesen |
+| `PUT` | `/admin/ack-settings` | admin | Modus ändern |
+| `GET` | `/distributions/summary` | reader | KPI für Dashboard |
+| `GET` | `/distributions` | contentowner+ | Alle Verteilrunden |
+| `GET` | `/distributions/:id` | contentowner+ | Detail + Statistik |
+| `POST` | `/distributions` | contentowner+ | Neue Verteilrunde anlegen |
+| `PUT` | `/distributions/:id` | contentowner+ | Status/Notizen aktualisieren |
+| `DELETE` | `/distributions/:id` | admin | Verteilrunde löschen |
+| `POST` | `/distributions/:id/send` | contentowner+ | E-Mails versenden |
+| `POST` | `/distributions/:id/remind` | contentowner+ | Erinnerung senden |
+| `GET` | `/distributions/:id/acks` | contentowner+ | Bestätigungen abrufen |
+| `POST` | `/distributions/:id/acks` | contentowner+ | Manuelle Bestätigung |
+| `POST` | `/distributions/:id/acks/import` | contentowner+ | CSV-Import |
+| `DELETE` | `/distributions/:id/acks/:ackId` | admin | Einzelne Bestätigung löschen |
+| `GET` | `/distributions/:id/export/csv` | contentowner+ | CSV-Export |
+| `GET` | `/ack/:token` | **öffentlich** | Bestätigungsseite anzeigen |
+| `POST` | `/ack/:token` | **öffentlich** | Bestätigung speichern |
+
+Die beiden `/ack/:token`-Routen erfordern **keinen Login** — sie funktionieren wie das öffentliche Incident-Formular.
+
+---
+
+### E-Mail-Kampagne: Ablauf
+
+1. Contentowner legt Verteilrunde an (Mode = `email_campaign`), trägt E-Mail-Adressen ein
+2. System erzeugt pro E-Mail-Adresse einen eindeutigen Token-Record in `policy-acks.json`
+3. `POST /distributions/:id/send` versendet personalisierte E-Mails mit Token-Link
+4. Mitarbeiter öffnet Link → sieht Policy-Inhalt + Bestätigungsbutton (kein Login)
+5. Nach Klick: `acknowledgedAt` + IP werden gespeichert, Erfolgsseite angezeigt
+6. Doppelte Bestätigung ist idempotent (bestehender Record wird zurückgegeben)
+7. Erinnerungen (nur an noch nicht Bestätigte) via `POST /distributions/:id/remind`
+
+---
+
+### CSV-Import-Format (Modus `manual`)
+
+```
+email;name;datum
+alice@firma.de;Alice Müller;2026-03-13
+bob@firma.de;Bob Schmidt;
+```
+
+Datum ist optional (leer = aktueller Zeitstempel). Import via `POST /distributions/:id/acks/import` mit Body `{ "rows": [...] }`.
+
+---
+
+### Neue Dateien
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `server/db/ackStore.js` | Store: Verteilrunden + Bestätigungen |
+| `server/routes/acknowledgements.js` | Auth-geschützte API-Routen |
+| `server/routes/ackPublic.js` | Öffentliche Token-Routen (`/ack/:token`) |
+| `data/policy-distributions.json` | Persistenz: Verteilrunden |
+| `data/policy-acks.json` | Persistenz: Bestätigungen |
+| `tests/acknowledgements.test.js` | 28 Tests |
+
+`server/db/orgSettingsStore.js` — neues Feld `policyAckMode` (Default: `manual`)
+
+---
+
+### Tests
+
+28 neue Tests in `tests/acknowledgements.test.js`:
+- Ack-Settings (Modus lesen/ändern, Rollen-Guards)
+- Dashboard-Summary
+- Distributions CRUD (anlegen, lesen, Status-Update, RBAC)
+- Manuelle Bestätigungen (hinzufügen, CSV-Import, löschen)
+- CSV-Export
+- E-Mail-Kampagne (anlegen, Token-Records, öffentliche Bestätigungsseite, idempotente Doppelbestätigung, Stats)
+- Löschen (RBAC: contentowner darf nicht, admin darf)
+
+**Gesamt: 229/229 Tests grün**
+
+
+---
+
+## 51. Scanner-Integration — Greenbone / OpenVAS XML & PDF Import (V 1.33.0)
+
+### Überblick
+
+Der ISMS Builder kann Scan-Ergebnisse von **Greenbone Security Manager / OpenVAS** direkt importieren und daraus **Risk-Draft-Einträge** erzeugen. Es werden zwei Export-Formate unterstützt:
+
+| Format | Parser | Genauigkeit | Ollama-Abhängigkeit |
+|--------|--------|-------------|---------------------|
+| **XML** (GMP-Export) | Regex-Parser | Sehr hoch | Keine |
+| **PDF** (Greenbone-Bericht) | Regex + LLM-Fallback | Hoch | Optional (llama3.2:3b) |
+
+> **Hinweis:** Beim PDF-Import liefert Ollama (llama3.2:3b) deutlich höhere Erkennungsraten als reiner Regex — besonders bei unstrukturierten Seiten. XML-Import benötigt kein LLM.
+
+---
+
+### Workflow
+
+```
+1. Greenbone / OpenVAS: Scan-Ergebnisse als XML (GMP) oder PDF exportieren
+2. ISMS Builder: Admin → Wartung → Scanner-Import
+3. Datei hochladen + Metadaten eingeben (Entität, Scan-Referenz, Datum)
+4. Parser extrahiert Schwachstellen → Clustering → Risk-Drafts werden angelegt
+5. Risk-Register: neue Draft-Einträge erscheinen unter "Risiken" zur Prüfung
+```
+
+---
+
+### API
+
+```
+POST /admin/scan-import/upload   – Datei hochladen (auditor+)
+  Multipart-Form-Data:
+    file        – XML oder PDF-Datei (max. 20 MB)
+    entityId    – Ziel-Gesellschaft (optional)
+    scanRef     – Scan-Referenz / Name (z.B. "Q1-2026-Infrastruktur")
+    scanDate    – Scan-Datum (ISO-Format, optional)
+    skipDuplicates – true/false (verhindert doppelte Importe gleicher Schwachstelle)
+
+GET  /admin/scan-import/status   – Import-Verlauf + Statistiken (auditor+)
+```
+
+---
+
+### XML-Parser (greenboneXmlParser.js)
+
+Parst den **GMP-XML-Export** von Greenbone. Extrahiert pro Result:
+
+| Feld | Quelle im XML |
+|------|---------------|
+| NVT-OID | `<nvt oid="...">` |
+| Name / Titel | `<nvt><name>` |
+| CVSS-Score | `<severity>` |
+| CVE-IDs | `<refs><ref type="cve">` |
+| Hostname / IP | `<host>` |
+| Port | `<port>` |
+| Summary / Beschreibung | `<nvt><tags>summary=...` |
+| Solution | `<nvt><tags>solution=...` |
+
+**CVSS → Schweregrad-Mapping:**
+
+| CVSS | Schweregrad |
+|------|-------------|
+| ≥ 9.0 | `critical` |
+| ≥ 7.0 | `high` |
+| ≥ 4.0 | `medium` |
+| < 4.0 | `low` |
+| ≤ 0   | Ignoriert (Log-Einträge) |
+
+---
+
+### PDF-Parser (greenobonePdfParser.js)
+
+**Stufe 1 — Regex-Parser:** Erkennt strukturierte Greenbone-PDF-Layouts durch Muster-Matching auf bekannte Überschriften (`Summary:`, `Solution:`, `CVSS:`, `CVE:`, etc.).
+
+**Stufe 2 — Ollama-Fallback:** Wenn der Regex-Parser keine ausreichenden Daten findet, wird der Seiteninhalt an ein lokales Ollama-Modell (Standard: `llama3.2:3b`) übergeben. Das Modell extrahiert die Schwachstelleninformationen strukturiert.
+
+**Ollama-Konfiguration** (`.env` oder Server-Defaults):
+```
+OLLAMA_HOST=localhost
+OLLAMA_PORT=11434
+OLLAMA_MODEL=llama3.2:3b
+```
+
+---
+
+### Clustering & Deduplication (scanImporter.js)
+
+**Clustering:** Mehrere Hosts mit derselben Schwachstelle (gleiche NVT-OID) werden zu **einem Risk-Eintrag** zusammengefasst. Alle betroffenen Hosts werden im Risk-Titel und der Beschreibung aufgeführt.
+
+**Deduplication:** Mit `skipDuplicates=true` prüft der Importer ob bereits ein Risiko mit der Kombination aus `scanRef + nvtOid` existiert. Gefundene Duplikate werden übersprungen und gezählt.
+
+**CVSS → Risk-Mapping:**
+
+| Schweregrad | Impact | Probability | Risk-Score |
+|-------------|--------|-------------|------------|
+| critical | 5 | 4 | 20 |
+| high | 4 | 3 | 12 |
+| medium | 3 | 2 | 6 |
+| low | 2 | 2 | 4 |
+
+Alle importierten Risiken erhalten Status `draft` und werden im Audit-Log protokolliert:
+`"XML/PDF Import: N Risiken erstellt, M übersprungen"`
+
+---
+
+### State-Tracking
+
+`data/scan-import-state.json` speichert den Verlauf der letzten 20 Imports:
+
+```json
+{
+  "totalImported": 47,
+  "lastImport": "2026-03-13T15:00:00.000Z",
+  "lastScanRef": "Q1-2026-Infrastruktur",
+  "lastMethod": "xml",
+  "lastImportedBy": "admin@example.com",
+  "history": [...]
+}
+```
+
+---
+
+### Neue Dateien
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `server/routes/scanImport.js` | Upload-Route + Status-Endpunkt |
+| `server/ai/greenboneXmlParser.js` | GMP-XML-Parser |
+| `server/ai/greenobonePdfParser.js` | PDF-Parser mit Regex + Ollama-Fallback |
+| `server/ai/scanImporter.js` | Clustering, Deduplication, Risk-Draft-Erstellung |
+| `data/scan-import-state.json` | Import-Verlauf + Statistiken |
+
+
+---
+
+## 52. Guidance – Vollständiges CRUD & Suche (V 1.35.0)
+
+### Überblick
+
+Seit V 1.35.0 können Benutzer mit der Rolle `contentowner` und höher eigene Guidance-Dokumente **erstellen, bearbeiten und löschen** — nicht nur die systemseitig geseedeten Einträge. Dies ermöglicht z.B. interne Betriebsanleitungen, Tipps & Tricks des Admins, abteilungsspezifische Verfahrenshinweise oder ergänzende ISMS-Dokumentation ohne externen Dateiserver.
+
+### Rollen & Berechtigungen
+
+| Aktion | Mindestrolle |
+|---|---|
+| Dokumente lesen | `reader` |
+| Dokumente erstellen (Markdown/HTML) | `contentowner` |
+| Dokumente bearbeiten | `contentowner` |
+| Datei-Upload (PDF/DOCX/DOC) | `contentowner` |
+| Dokumente löschen (Soft-Delete) | `admin` |
+
+Seeded Dokumente (erkennbar an `seedId`-Feld) können von Admins ebenfalls bearbeitet/gelöscht werden. Der Server legt sie beim nächsten Neustart jedoch neu an, wenn kein permanentes Delete erfolgt ist.
+
+### UI-Elemente
+
+In der Guidance-Ansicht stehen `contentowner+` zwei Schaltflächen in der Header-Leiste zur Verfügung:
+
+- **Neu** (`openGuidanceEditor()`) — öffnet ein Inline-Formular im Viewer-Bereich zum Anlegen eines Markdown- oder HTML-Dokuments
+- **Upload** (`openGuidanceUpload()`) — öffnet ein Inline-Formular zum Hochladen einer PDF-, DOCX- oder DOC-Datei (max. 20 MB)
+
+Beim Anzeigen eines Dokuments erscheinen zusätzlich:
+- **Edit** (`openGuidanceEditor(doc)`) — öffnet dasselbe Formular vorausgefüllt mit dem aktuellen Inhalt
+- **Löschen** (Papierkorb-Icon, nur `admin`) — Soft-Delete mit Wiederherstellungsmöglichkeit über Admin → Papierkorb
+
+Alle Formulare folgen dem **training-form-page Inline-Pattern** — keine Overlays oder Modals.
+
+### Inline-Formular: Neues / bearbeitetes Dokument
+
+Felder:
+
+| Feld | Typ | Pflicht | Hinweis |
+|---|---|---|---|
+| Title | Text-Input | Ja | Anzeigename in Dokumentenliste |
+| Category | Select | Ja | systemhandbuch / rollen / policy-prozesse / soa-audit / admin-intern |
+| Type | Select | Nur bei Neu | `markdown` (Standard) oder `html` |
+| Content | Textarea | Nein | Markdown-/HTML-Inhalt; Edit/Preview-Tabs |
+| Verknüpfte Controls | Control-Picker | Nein | Links zu SoA-Controls (`linkedControls[]`) |
+
+Edit/Preview-Tabs: Per Klick auf „Preview" wird der Markdown-Inhalt live via `marked.js` gerendert. Wechsel zurück zu „Edit" zeigt wieder die Textarea.
+
+### Inline-Formular: Datei-Upload
+
+Felder:
+
+| Feld | Typ | Pflicht |
+|---|---|---|
+| Title | Text-Input | Ja |
+| Category | Select | Ja |
+| File | File-Input | Ja — PDF, DOCX, DOC, max. 20 MB |
+
+Dateien werden unter `data/guidance/files/` gespeichert. Bei Soft-Delete bleibt die Datei erhalten; bei permanentem Delete (`DELETE /guidance/:id/permanent`) wird die Datei physisch gelöscht.
+
+### API-Endpunkte
+
+| Methode | Pfad | Mindestrolle | Beschreibung |
+|---|---|---|---|
+| `GET` | `/guidance` | reader | Liste aller Dokumente (gefiltert nach `category`, `lang`) |
+| `GET` | `/guidance?search=query` | reader | Kategorieübergreifende Volltextsuche (Titel + Inhalt); gibt Treffer mit `excerpt`-Feld zurück |
+| `GET` | `/guidance/:id` | reader | Einzeldokument |
+| `GET` | `/guidance/:id/file` | reader | Datei-Download (PDF/DOCX) |
+| `POST` | `/guidance` | contentowner | Neues Markdown/HTML-Dokument anlegen |
+| `POST` | `/guidance/upload` | contentowner | Datei hochladen (multipart/form-data) |
+| `PUT` | `/guidance/:id` | contentowner | Dokument aktualisieren |
+| `DELETE` | `/guidance/:id` | admin | Soft-Delete |
+| `DELETE` | `/guidance/:id/permanent` | admin | Permanentes Löschen (inkl. Datei) |
+| `POST` | `/guidance/:id/restore` | admin | Wiederherstellen aus Papierkorb |
+
+### Dateiformat (data/guidance.json)
+
+```json
+{
+  "id": "guid_1710000000000",
+  "seedId": null,
+  "category": "systemhandbuch",
+  "title": "Mein Betriebshandbuch",
+  "type": "markdown",
+  "content": "# Überschrift\n\nText...",
+  "filename": null,
+  "version": 1,
+  "language": "de",
+  "linkedControls": ["ISO-5.1"],
+  "createdAt": "2026-03-13T10:00:00.000Z",
+  "updatedAt": "2026-03-13T10:00:00.000Z",
+  "deletedAt": null,
+  "deletedBy": null
+}
+```
+
+Für hochgeladene Dateien gilt: `type` ist `pdf` oder `docx`, `content` ist `null`, `filename` enthält den gespeicherten Dateinamen.
+
+### Abgrenzung: User-Dokumente vs. Seed-Dokumente
+
+| Eigenschaft | Seed-Dokument | User-Dokument |
+|---|---|---|
+| `seedId` | gesetzt (z.B. `seed_demo_overview`) | `null` |
+| Überschreiben beim Serverstart | Ja (bei Sprachwechsel) | Nein |
+| Löschbar | Ja (admin, Soft-Delete) | Ja (admin, Soft-Delete) |
+| Wird nach Neustart wiederhergestellt | Ja (wenn nur Soft-Delete) | Nein |

@@ -1,6 +1,6 @@
 {
   "name": "isms-build",
-  "version": "1.34.1",
+  "version": "1.35.0",
   "description": "ISMS Template Builder – Build Mode",
   "scripts": {
     "start": "node server/index.js",

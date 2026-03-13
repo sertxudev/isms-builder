@@ -1340,7 +1340,35 @@ hr { border: none; border-top: 1px solid var(--border); margin: 0; }
   font-weight: 600;
   flex: 1;
 }
-.guidance-header-actions { display: flex; gap: 8px; }
+.guidance-header-actions { display: flex; gap: 8px; align-items: center; }
+.guidance-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.guidance-search-icon {
+  position: absolute;
+  left: 8px;
+  color: var(--text-subtle);
+  font-size: 14px;
+  pointer-events: none;
+}
+.guidance-search-input {
+  height: 32px;
+  padding: 0 10px 0 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--text);
+  font-size: 13px;
+  width: 220px;
+  transition: width 0.2s, border-color 0.15s;
+}
+.guidance-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  width: 280px;
+}
 
 .guidance-cat-tabs {
   display: flex;

@@ -42,6 +42,30 @@ function getAll(userRank) {
   return load().filter(d => !d.deletedAt && _visibleFor(d, rank)).map(d => publicDoc(d))
 }
 
+function search(query, userRank) {
+  if (!query || !query.trim()) return []
+  const rank = userRank != null ? userRank : 1
+  const q = query.trim().toLowerCase()
+  return load()
+    .filter(d => !d.deletedAt && _visibleFor(d, rank))
+    .filter(d => {
+      if (d.title && d.title.toLowerCase().includes(q)) return true
+      if (d.content && d.content.toLowerCase().includes(q)) return true
+      return false
+    })
+    .map(d => {
+      const pub = publicDoc(d)
+      // Add a short excerpt around the first content match
+      if (d.content && d.content.toLowerCase().includes(q)) {
+        const idx = d.content.toLowerCase().indexOf(q)
+        const start = Math.max(0, idx - 60)
+        const end = Math.min(d.content.length, idx + q.length + 60)
+        pub.excerpt = (start > 0 ? '…' : '') + d.content.slice(start, end).replace(/\n/g, ' ') + (end < d.content.length ? '…' : '')
+      }
+      return pub
+    })
+}
+
 function getByCategory(cat, userRank) {
   const rank = userRank != null ? userRank : 1
   return load()
@@ -3858,7 +3882,7 @@ function seedIsoNotice() {
 }
 
 module.exports = {
-  getAll, getByCategory, getById, create, update, delete: del,
+  getAll, getByCategory, search, getById, create, update, delete: del,
   permanentDelete, restore, getDeleted, getFilePath, VALID_CATEGORIES,
   seedArchitectureDocs,
   seedDemoDoc:    seedDemoDocI18n,
